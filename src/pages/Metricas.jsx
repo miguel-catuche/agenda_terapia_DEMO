@@ -1,8 +1,12 @@
 import React from "react";
 import DonutCard from "@/components/DonutCard";
 import Icon from "@/components/Icons";
+import { useClientes } from "@/hooks/useClientes";
+import { useCitas } from "@/hooks/useCitas";
 import ExportadorMensual from "@/components/ExportadorMensual";
-const Metricas = ({ clientes, citas }) => {
+const Metricas = () => {
+    const { clientes } = useClientes();
+    const { citas } = useCitas();
 
     const hoy = new Date();
     const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
@@ -60,41 +64,40 @@ const Metricas = ({ clientes, citas }) => {
 
     // Totales semanales
     const nuevosSemana = clientes.filter(c => {
-        if (!c.createdAt?.toDate) return false;
-        const fecha = c.createdAt.toDate();
-        return fecha >= new Date(startDateStr) && fecha <= new Date(endDateStr);
+        if (!c.created_at) return false;
+        const fecha = new Date(c.created_at);
+        const inicio = new Date(`${startDateStr}T00:00:00`);
+        const fin = new Date(`${endDateStr}T23:59:59`);
+        return fecha >= inicio && fecha <= fin;
     }).length;
 
+
     const nuevosSemanaTerapia = clientes.filter(c => {
-        if (!c.createdAt?.toDate || !c.motivo) return false;
-        const fecha = c.createdAt.toDate();
-        return (
-            fecha >= new Date(startDateStr) &&
-            fecha <= new Date(endDateStr) &&
-            c.motivo === "Terapia"
-        );
+        if (!c.created_at) return false;
+        const fecha = new Date(c.created_at);
+        const inicio = new Date(`${startDateStr}T00:00:00`);
+        const fin = new Date(`${endDateStr}T23:59:59`);
+        return fecha >= inicio && fecha <= fin;
     }).length;
 
     const nuevosSemanaValoracion = clientes.filter(c => {
-        if (!c.createdAt?.toDate || !c.motivo) return false;
-        const fecha = c.createdAt.toDate();
-        return (
-            fecha >= new Date(startDateStr) &&
-            fecha <= new Date(endDateStr) &&
-            c.motivo === "Valoracion"
-        );
+        if (!c.created_at) return false;
+        const fecha = new Date(c.created_at);
+        const inicio = new Date(`${startDateStr}T00:00:00`);
+        const fin = new Date(`${endDateStr}T23:59:59`);
+        return fecha >= inicio && fecha <= fin;
     }).length;
 
     // Totales mensuales
     const nuevosMes = clientes.filter(c => {
-        if (!c.createdAt?.toDate) return false;
-        const fecha = c.createdAt.toDate();
+        if (!c.created_at) return false;
+        const fecha = new Date(c.created_at);
         return fecha.getMonth() === mesActual && fecha.getFullYear() === añoActual;
     }).length;
 
     const nuevosMesTerapia = clientes.filter(c => {
-        if (!c.createdAt?.toDate || !c.motivo) return false;
-        const fecha = c.createdAt.toDate();
+        if (!c.created_at) return false;
+        const fecha = new Date(c.created_at);
         return (
             fecha.getMonth() === mesActual &&
             fecha.getFullYear() === añoActual &&
@@ -103,8 +106,8 @@ const Metricas = ({ clientes, citas }) => {
     }).length;
 
     const nuevosMesValoracion = clientes.filter(c => {
-        if (!c.createdAt?.toDate || !c.motivo) return false;
-        const fecha = c.createdAt.toDate();
+        if (!c.created_at) return false;
+        const fecha = new Date(c.created_at);
         return (
             fecha.getMonth() === mesActual &&
             fecha.getFullYear() === añoActual &&
@@ -204,8 +207,8 @@ const Metricas = ({ clientes, citas }) => {
                 </div>
             </div>
             <div className="mt-6">
-    <ExportadorMensual citas={citas} clientes={clientes} />
-  </div>
+                <ExportadorMensual citas={citas} clientes={clientes} />
+            </div>
         </div>
 
     );

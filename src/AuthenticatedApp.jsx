@@ -7,17 +7,7 @@ import Metricas from "./pages/Metricas";
 import { AnimatePresence } from "framer-motion";
 import AnimatedPage from "./components/AnimatedPage";
 
-const AuthenticatedApp = ({
-  clientes,
-  citas,
-  onAddClient,
-  onUpdateClient,
-  onDeleteClient,
-  onAddCita,
-  onUpdateCita,
-  onDeleteCita,
-  onLogout,
-}) => {
+const AuthenticatedApp = ({ onLogout }) => {
   const location = useLocation();
 
   return (
@@ -34,12 +24,7 @@ const AuthenticatedApp = ({
                   path="/clientes"
                   element={
                     <AnimatedPage>
-                      <ClientesPage
-                        clientes={clientes}
-                        onAddClient={onAddClient}
-                        onUpdateClient={onUpdateClient}
-                        onDeleteClient={onDeleteClient}
-                      />
+                      <ClientesPage />
                     </AnimatedPage>
                   }
                 />
@@ -47,13 +32,7 @@ const AuthenticatedApp = ({
                   path="/horario"
                   element={
                     <AnimatedPage>
-                      <HorarioMedico
-                        citas={citas}
-                        clientes={clientes}
-                        onAddCita={onAddCita}
-                        onUpdateCita={onUpdateCita}
-                        onDeleteCita={onDeleteCita}
-                      />
+                      <HorarioMedico />
                     </AnimatedPage>
                   }
                 />
@@ -61,10 +40,7 @@ const AuthenticatedApp = ({
                   path="/metricas"
                   element={
                     <AnimatedPage>
-                      <Metricas
-                        citas={citas}
-                        clientes={clientes}
-                      />
+                      <Metricas />
                     </AnimatedPage>
                   }
                 />

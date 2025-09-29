@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useCitas } from '@/hooks/useCitas';
 import { useMemo } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useClientes } from '@/hooks/useClientes';
 import Icon from '@/components/Icons';
 import toast from 'react-hot-toast';
 import html2pdf from 'html2pdf.js';
@@ -47,7 +48,16 @@ const getMotivoColors = (motivo) => {
     }
 }
 
-const ClientesPage = ({ clientes, onAddClient, onUpdateClient, onDeleteClient }) => {
+const ClientesPage = () => {
+    const {
+        clientes,
+        loading: loadingClientes,
+        addCliente,
+        updateCliente,
+        deleteCliente,
+        refetch: refetchClientes,
+    } = useClientes();
+
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -57,7 +67,11 @@ const ClientesPage = ({ clientes, onAddClient, onUpdateClient, onDeleteClient })
     const [formData, setFormData] = useState({ id: '', nombre: '', motivo: '', telefono: '' });
     const [clientesAleatorios, setClientesAleatorios] = useState([]);
     const [query, setQuery] = useState("");
-    const citas = useCitas();
+    const currentYear = new Date().getFullYear();
+    const startDate = `${currentYear}-01-01`;
+    const endDate = `${currentYear}-12-31`;
+    const { citas, loading, refetch } = useCitas(startDate, endDate);
+
 
     const openAddModal = () => {
         setFormData({ id: '', nombre: '', motivo: '', telefono: '' });
@@ -80,7 +94,7 @@ const ClientesPage = ({ clientes, onAddClient, onUpdateClient, onDeleteClient })
         setShowHistoryModal(true);
     }
 
-    const handleAddSubmit = (e) => {
+    const handleAddSubmit = async (e) => {
         e.preventDefault();
 
         const id = formData.id?.trim();
@@ -106,9 +120,11 @@ const ClientesPage = ({ clientes, onAddClient, onUpdateClient, onDeleteClient })
             return;
         }
 
-        onAddClient({ id, nombre, motivo, telefono });
-        setShowAddModal(false);
-        setFormData({ id: "", nombre: "", motivo: "", telefono: "" });
+        const success = await addCliente({ id, nombre, motivo, telefono });
+        if (success) {
+            setShowAddModal(false);
+            setFormData({ id: "", nombre: "", motivo: "", telefono: "" });
+        }
     };
 
 
@@ -118,23 +134,26 @@ const ClientesPage = ({ clientes, onAddClient, onUpdateClient, onDeleteClient })
         setShowEditConfirmModal(true);
     };
 
-    const handleEditConfirm = () => {
-        onUpdateClient(formData.id, formData);
+    const handleEditConfirm = async () => {
+        await updateCliente(formData.id, formData);
         setShowEditConfirmModal(false);
     };
 
-    const handleDeleteConfirm = () => {
-        onDeleteClient(selectedClient.id);
+    const handleDeleteConfirm = async () => {
+        await deleteCliente(selectedClient.id);
         setShowDeleteModal(false);
     };
 
     const historialCitas = Array.isArray(citas) && selectedClient?.id
         ? [...citas]
-            .filter((cita) => String(cita.clienteId) === String(selectedClient.id))
+            .filter((cita) => `${cita.cliente_id}` === `${selectedClient.id}`)
             .sort((a, b) => {
-                const fechaA = new Date(`${a.fecha}T${a.hora}`);
-                const fechaB = new Date(`${b.fecha}T${b.hora}`);
-                return fechaB - fechaA;
+                const getTimestamp = (cita) => {
+                    const [year, month, day] = cita.fecha.split("-");
+                    const [hour, minute] = cita.hora.split(":");
+                    return new Date(year, month - 1, day, hour, minute).getTime();
+                };
+                return getTimestamp(b) - getTimestamp(a); // más recientes primero
             })
         : [];
 
@@ -480,7 +499,7 @@ const ClientesPage = ({ clientes, onAddClient, onUpdateClient, onDeleteClient })
                                             <div className="flex justify-between items-center">
                                                 <div className="text-sm text-gray-700">
                                                     <p><strong>Fecha:</strong> {cita.fecha}</p>
-                                                    <p><strong>Hora:</strong> {cita.hora}</p>
+                                                    <p><strong>Hora:</strong> {typeof cita.hora === "string" ? cita.hora.slice(0, 5) : "—"}</p>
                                                     <p>
                                                         <strong>Estado:</strong>{" "}
                                                         <span className={`inline-block min-w-[15px] px-2 text-sm font-medium text-white text-center rounded ${getEstadoColor(cita.estado)}`}>

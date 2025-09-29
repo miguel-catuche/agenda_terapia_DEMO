@@ -2,6 +2,7 @@
 import React, { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { getDateForDay } from "@/helpers/dateHelpers";
 import {
   Select,
   SelectContent,
@@ -91,35 +92,6 @@ const CitasModal = ({
     </svg>
   );
 
-  //const [confirmDelete, setConfirmDelete] = useState(false);
-
-  // Helper para obtener la fecha de un día de la semana
-  const getDateForDay = useCallback((date, day) => {
-    const inputDate = new Date(date);
-    const dayOfWeek = inputDate.getDay(); // 0 (domingo) a 6 (sábado)
-    const offsetToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-
-    const monday = new Date(inputDate);
-    monday.setDate(inputDate.getDate() + offsetToMonday);
-
-    const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
-    const dayIndex = days.indexOf(day);
-
-    const targetDate = new Date(monday);
-    targetDate.setDate(monday.getDate() + dayIndex);
-
-    const formatLocalDate = (d) => {
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${y}-${m}-${day}`;
-    };
-
-    return formatLocalDate(targetDate);
-  }, []);
-
-
-
   const hours = [
     "07:00:00",
     "08:00:00",
@@ -151,7 +123,7 @@ const CitasModal = ({
             ) : (
               <ul className="text-sm space-y-2 flex flex-col items-start w-full">
                 {citasByDate[`${getDateForDay(selectedDate, selectedCell.day)}-${selectedCell.hour.slice(0, 2)}`]?.map((c) => {
-                  const cliente = clientes?.find((cl) => cl.id === c.clienteId);
+                  const cliente = clientes?.find((cl) => cl.id === c.cliente_id);
                   return (
                     <li key={c.id} className={`w-full max-w-[22rem] text-left flex justify-between items-center px-4 py-2 rounded-lg ${getEstadoClasses(c.estado)}`}>
                       <div>
@@ -212,7 +184,7 @@ const CitasModal = ({
                         ) : (
                           <ul className="text-sm space-y-2 flex flex-col items-start">
                             {citasHora.map((c) => {
-                              const cliente = clientes?.find((cl) => cl.id === c.clienteId);
+                              const cliente = clientes?.find((cl) => cl.id === c.cliente_id);
                               return (
                                 <li key={c.id} className={`w-full max-w-[24rem] text-left text-gray-900 flex justify-between items-center px-4 py-2 rounded-lg ${getEstadoClasses(c.estado)}`}>
                                   <div>
@@ -280,7 +252,7 @@ const CitasModal = ({
                 <label className="block text-sm text-gray-700">Número de documento</label>
                 <Input
                   type="text"
-                  value={selectedAppointment.clienteId}
+                  value={selectedAppointment.cliente_id}
                   readOnly
                   className="bg-gray-100 cursor-not-allowed"
                 />

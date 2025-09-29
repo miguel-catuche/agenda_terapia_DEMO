@@ -62,8 +62,8 @@ const ExportadorMensual = ({ citas, clientes }) => {
         const fechaFiltro = `${año}-${mes}`;
         const citasMes = citas.filter(c => c.fecha?.startsWith(fechaFiltro));
         const clientesMes = clientes.filter(c => {
-            if (!c.createdAt?.toDate) return false;
-            const f = c.createdAt.toDate();
+            if (!c.created_at) return false;
+            const f = new Date(c.created_at);
             return f.getFullYear() === parseInt(año) && String(f.getMonth() + 1).padStart(2, "0") === mes;
         });
 

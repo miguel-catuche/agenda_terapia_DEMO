@@ -6,21 +6,11 @@ import { Input } from "@/components/ui/input";
 import CitasModal from "../components/CitasModal";
 import toast from 'react-hot-toast';
 import Icon from "@/components/Icons";
+import { useCitas } from "@/hooks/useCitas";
+import { useClientes } from "@/hooks/useClientes";
+import { supabase } from "@/supabaseClient";
+import { getDateForDay } from "@/helpers/dateHelpers";
 import { ScrollSync, ScrollSyncPane } from "react-scroll-sync";
-
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-  doc,
-  updateDoc,
-  deleteDoc,
-  addDoc,
-  serverTimestamp
-} from "firebase/firestore";
-
-import { db } from "@/firebase";
 
 const hours = [
   "07:00:00",
@@ -35,19 +25,6 @@ const hours = [
 const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 const allowedHours = ["07", "08", "09", "10", "14", "15", "16", "17"];
 const allowedMinutes = ["00", "15", "30", "45"];
-
-
-// Helper function para obtener la fecha de un día de la semana
-const getDateForDay = (date, day) => {
-  const daysNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
-  const idx = daysNames.indexOf(day);
-  const { monday } = getWeekRange(date);
-
-  const target = new Date(monday);
-  target.setDate(monday.getDate() + idx);
-
-  return formatLocalDate(target);
-};
 
 const formatLocalDate = (d) => {
   const y = d.getFullYear();
@@ -100,8 +77,6 @@ const getInitialMonday = () => {
 
 export default function HorarioMedico() {
   const [mode, setMode] = useState("view");
-  const [clientes, setClientes] = useState([]);
-  const [citas, setCitas] = useState([]);
   const [selectedDate, setSelectedDate] = useState(getInitialMonday());
   const [selectedCell, setSelectedCell] = useState(null);
   const [selectedDay, setSelectedDay] = useState(null);
@@ -113,8 +88,16 @@ export default function HorarioMedico() {
   const [searchResults, setSearchResults] = useState([]);
   const [selectedClient, setSelectedClient] = useState(null);
   const [formData, setFormData] = useState({ hora: "" });
+  const { clientes, refetch: refetchClientes } = useClientes();
+  const { startDateStr, endDateStr } = getWeekRange(selectedDate);
+const { citas, addCita, updateCita, deleteCita, refetch: refetchCitas } = useCitas(startDateStr, endDateStr);
   const headerScrollRef = useRef(null);
   const gridScrollRef = useRef(null);
+
+  const now = new Date();
+const colombiaOffsetMs = 5 * 60 * 60 * 1000; // UTC-5
+const colombiaDate = new Date(now.getTime() - colombiaOffsetMs);
+const colombiaISOString = colombiaDate.toISOString();
 
   useEffect(() => {
     const header = headerScrollRef.current;
@@ -144,38 +127,6 @@ export default function HorarioMedico() {
     };
   }, []);
 
-  useEffect(() => {
-    // 🔄 Escuchar clientes en tiempo real
-    const unsubscribeClientes = onSnapshot(collection(db, "clientes"), (snapshot) => {
-      const clientesData = snapshot.docs.map(doc => doc.data());
-      setClientes(clientesData);
-    });
-
-    return () => unsubscribeClientes();
-  }, []);
-
-  useEffect(() => {
-  }, [citas]);
-
-  useEffect(() => {
-    const { startDateStr, endDateStr } = getWeekRange(selectedDate);
-
-    const citasQuery = query(
-      collection(db, "citas"),
-      where("fecha", ">=", startDateStr),
-      where("fecha", "<=", endDateStr)
-    );
-
-    const unsubscribe = onSnapshot(citasQuery, (snapshot) => {
-      const citasData = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-        docId: doc.id,
-      }));
-      setCitas(citasData);
-    });
-
-    return () => unsubscribe();
-  }, [selectedDate]);
 
   const citasByDate = useMemo(() => {
     return citas.reduce((acc, cita) => {
@@ -218,67 +169,79 @@ export default function HorarioMedico() {
         toast.error("Debes seleccionar un cliente antes de guardar la cita");
         return;
       }
+      if (!selectedCell?.day) {
+        toast.error("No se ha seleccionado una celda válida");
+        return;
+      }
 
       const nuevaCita = {
-        clienteId: selectedClient.id,
+        cliente_id: selectedClient.id,
         nombre: selectedClient.nombre,
         fecha: getDateForDay(selectedDate, selectedCell.day),
-        hora: hora.split(":").slice(0, 2).join(":"),
+        hora: hora + ":00",
         estado: "programada",
-        creadoEn: serverTimestamp(),
-        actualizadoEn: serverTimestamp(),
+        created_at: colombiaISOString,
+        updated_at: colombiaISOString
       };
 
-      try {
-        await addDoc(collection(db, "citas"), nuevaCita);
+      const success = await addCita(nuevaCita);
+      if (success) {
         toast.success(`Cita para ${selectedClient.nombre} añadida a las ${hora}`);
         setShowForm(false);
         setSelectedClient(null);
         setFormData({ hora: "" });
-      } catch (error) {
-        console.error("Error al guardar la cita:", error);
+        await refetchCitas();
+      } else {
         toast.error("Hubo un problema al guardar la cita");
       }
     },
-    [formData, selectedCell, selectedDate, selectedClient]
+    [formData, selectedCell, selectedDate, selectedClient, addCita, refetchCitas]
   );
+
+
 
   const handleUpdate = useCallback(async (e) => {
     e.preventDefault();
-    if (!selectedAppointment?.docId) return;
+    if (!selectedAppointment?.id) return;
 
-    const { nombre, fecha, hora, estado, clienteId } = selectedAppointment;
+    const { nombre, fecha, hora, estado, cliente_id } = selectedAppointment;
 
-    try {
-      await updateDoc(doc(db, "citas", selectedAppointment.docId), {
-        nombre,
-        fecha,
-        hora,
-        estado,
-        clienteId,
-        actualizadoEn: serverTimestamp(),
-      });
+    const citaActualizada = {
+      nombre,
+      fecha,
+      hora: hora.split(":").length === 2 ? hora + ":00" : hora,
+      estado,
+      cliente_id,
+      updated_at: new Date().toISOString()
+    };
 
+    const success = await updateCita(selectedAppointment.id, citaActualizada);
+    if (success) {
       setShowEditModal(false);
       setSelectedAppointment(null);
-    } catch (error) {
-      console.error("Error al actualizar la cita:", error);
+      toast.success("Cita actualizada correctamente");
+      await refetchCitas();
+    } else {
       toast.error("Hubo un problema al actualizar la cita");
     }
-  }, [selectedAppointment]);
+  }, [selectedAppointment, updateCita, refetchCitas]);
 
 
   const handleDelete = useCallback(async () => {
-    if (!selectedAppointment?.docId) return;
+    const citaId = selectedAppointment?.id || selectedAppointment?.docId;
+    if (!citaId) return;
 
-    try {
-      await deleteDoc(doc(db, "citas", selectedAppointment.docId));
+    const success = await deleteCita(citaId);
+    if (success) {
       setShowEditModal(false);
       setSelectedAppointment(null);
-    } catch (error) {
-      console.error("Error al eliminar la cita:", error);
+      toast.success("Cita eliminada correctamente");
+      await refetchCitas();
+    } else {
+      toast.error("Hubo un problema al eliminar la cita");
     }
-  }, [selectedAppointment]);
+  }, [selectedAppointment, deleteCita, refetchCitas]);
+
 
   const semanaActual = useMemo(() => {
     const { monday, friday } = getWeekRange(selectedDate);
