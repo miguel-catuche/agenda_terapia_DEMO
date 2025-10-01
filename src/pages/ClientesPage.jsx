@@ -10,43 +10,9 @@ import { useClientes } from '@/hooks/useClientes';
 import Icon from '@/components/Icons';
 import toast from 'react-hot-toast';
 import html2pdf from 'html2pdf.js';
+import { generarPDFHistorial } from '@/components/utils/generarPDFHistorial';
 import HistorialDocumento from '@/components/HistorialDocumento';
-
-// Función para asignar colores a los estados de la cita
-const getEstadoColor = (estado) => {
-    switch (estado) {
-        case 'cancelada':
-            return 'bg-red-400';
-        case 'no-se-presento':
-            return 'bg-orange-400';
-        case 'programada':
-            return 'bg-blue-400';
-        case 'completada':
-            return 'bg-green-400';
-        default:
-            return 'bg-gray-200';
-    }
-};
-const estadoLabels = {
-    programada: "Programada",
-    completada: "Completada",
-    cancelada: "Cancelada",
-    "no-se-presento": "No se presentó",
-};
-
-const motivoLabels = {
-    Terapia: "Terapia",
-    Valoracion: "Valoración"
-}
-
-const getMotivoColors = (motivo) => {
-    switch (motivo) {
-        case "Terapia":
-            return 'bg-amber-300';
-        case "Valoracion":
-            return 'bg-fuchsia-300'
-    }
-}
+import { estadoLabels, getEstadoColor, getMotivoColor, motivoLabels } from '@/helpers/colorHelper';
 
 const ClientesPage = () => {
     const {
@@ -135,13 +101,25 @@ const ClientesPage = () => {
     };
 
     const handleEditConfirm = async () => {
-        await updateCliente(formData.id, formData);
+        const ok = await updateCliente(formData.id, formData);
         setShowEditConfirmModal(false);
+
+        if (ok) {
+            toast.success(`Cliente "${formData.nombre}" actualizado correctamente`);
+        } else {
+            toast.error("No se pudo actualizar el cliente");
+        }
     };
 
     const handleDeleteConfirm = async () => {
-        await deleteCliente(selectedClient.id);
+        const ok = await deleteCliente(selectedClient.id);
         setShowDeleteModal(false);
+
+        if (ok) {
+            toast.success(`Cliente "${selectedClient.nombre}" eliminado correctamente`);
+        } else {
+            toast.error("No se pudo eliminar el cliente");
+        }
     };
 
     const historialCitas = Array.isArray(citas) && selectedClient?.id
@@ -253,7 +231,7 @@ const ClientesPage = () => {
                                 <TableCell className="text-sm px-4 py-3 w-50">{cliente.id}</TableCell>
                                 <TableCell className="text-sm px-4 py-3 w-50">{cliente.telefono}</TableCell>
                                 <TableCell className="text-sm px-4 py-3 w-50">
-                                    <span className={`inline-block min-w-[15px] px-2 text-sm font-medium text-center rounded ${getMotivoColors(cliente.motivo)}`}>
+                                    <span className={`inline-block min-w-[15px] px-2 text-sm font-medium text-center rounded ${getMotivoColor(cliente.motivo)}`}>
                                         {motivoLabels[cliente.motivo] || cliente.motivo}
                                     </span>
                                 </TableCell>
@@ -470,11 +448,11 @@ const ClientesPage = () => {
                                 {historialCitas.length > 0 && (
                                     <Button
                                         variant="ghost"
-                                        onClick={handlePrint}
+                                        onClick={() => generarPDFHistorial(selectedClient, historialCitas)}
                                         className="cursor-pointer hover:text-white bg-blue-600 text-white hover:bg-blue-700"
                                     >
                                         Imprimir
-                                    </Button>
+                                    </Button>                                   
                                 )}
                                 <Button
                                     variant="ghost"
@@ -520,12 +498,6 @@ const ClientesPage = () => {
                     </div>
                 </div>
             )}
-            {/* Render oculto para impresión */}
-            <div className="hidden">
-                <div ref={pdfRef}>
-                    <HistorialDocumento cliente={selectedClient} citas={historialCitas} />
-                </div>
-            </div>
         </div>
 
     );

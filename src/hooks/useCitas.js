@@ -6,24 +6,38 @@ export const useCitas = (startDate, endDate) => {
   const [loading, setLoading] = useState(true);
 
   const fetchCitas = async () => {
-    let query = supabase.from("citas").select("*");
+    setLoading(true);
 
-    if (startDate && endDate) {
-      query = query
-        .gte("fecha", startDate)
-        .lte("fecha", endDate)
-        .order("fecha", { ascending: true });
-    } else {
-      query = query.order("fecha", { ascending: true });
+    const { data: citasData, error: citasError } = await supabase
+      .from("citas")
+      .select("*")
+      .gte("fecha", startDate)
+      .lte("fecha", endDate)
+      .order("fecha", { ascending: true });
+
+    const { data: clientesData, error: clientesError } = await supabase
+      .from("clientes")
+      .select("id, nombre");
+
+    if (citasError || clientesError) {
+      console.error(
+        "Error al cargar citas o clientes:",
+        citasError?.message || clientesError?.message
+      );
+      setLoading(false);
+      return;
     }
 
-    const { data, error } = await query;
+    // unir manualmente
+    const citasConCliente = citasData.map((cita) => {
+      const cliente = clientesData.find((c) => c.id === cita.cliente_id);
+      return {
+        ...cita,
+        cliente: cliente || null,
+      };
+    });
 
-    if (error) {
-      console.error("Error al cargar citas:", error.message);
-    } else {
-      setCitas(data || []);
-    }
+    setCitas(citasConCliente);
     setLoading(false);
   };
 
@@ -43,7 +57,10 @@ export const useCitas = (startDate, endDate) => {
       .select();
 
     if (error || !data || !data[0]) {
-      console.error("Error al agregar cita:", error?.message || "respuesta vacía");
+      console.error(
+        "Error al agregar cita:",
+        error?.message || "respuesta vacía"
+      );
       return false;
     }
 
@@ -59,21 +76,19 @@ export const useCitas = (startDate, endDate) => {
       .select();
 
     if (error || !data || !data[0]) {
-      console.error("Error al actualizar cita:", error?.message || "respuesta vacía");
+      console.error(
+        "Error al actualizar cita:",
+        error?.message || "respuesta vacía"
+      );
       return false;
     }
 
-    setCitas((prev) =>
-      prev.map((cita) => (cita.id === id ? data[0] : cita))
-    );
+    setCitas((prev) => prev.map((cita) => (cita.id === id ? data[0] : cita)));
     return true;
   };
 
   const deleteCita = async (id) => {
-    const { error } = await supabase
-      .from("citas")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("citas").delete().eq("id", id);
 
     if (error) {
       console.error("Error al eliminar cita:", error.message);
@@ -90,6 +105,6 @@ export const useCitas = (startDate, endDate) => {
     refetch: fetchCitas,
     addCita,
     updateCita,
-    deleteCita
+    deleteCita,
   };
 };

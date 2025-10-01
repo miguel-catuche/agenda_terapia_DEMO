@@ -8,9 +8,8 @@ import toast from 'react-hot-toast';
 import Icon from "@/components/Icons";
 import { useCitas } from "@/hooks/useCitas";
 import { useClientes } from "@/hooks/useClientes";
-import { supabase } from "@/supabaseClient";
 import { getDateForDay } from "@/helpers/dateHelpers";
-import { ScrollSync, ScrollSyncPane } from "react-scroll-sync";
+import GeneradorSeguimiento from "@/components/GeneradorSeguimient";
 
 const hours = [
   "07:00:00",
@@ -90,14 +89,14 @@ export default function HorarioMedico() {
   const [formData, setFormData] = useState({ hora: "" });
   const { clientes, refetch: refetchClientes } = useClientes();
   const { startDateStr, endDateStr } = getWeekRange(selectedDate);
-const { citas, addCita, updateCita, deleteCita, refetch: refetchCitas } = useCitas(startDateStr, endDateStr);
+  const { citas, addCita, updateCita, deleteCita, refetch: refetchCitas } = useCitas(startDateStr, endDateStr);
   const headerScrollRef = useRef(null);
   const gridScrollRef = useRef(null);
 
   const now = new Date();
-const colombiaOffsetMs = 5 * 60 * 60 * 1000; // UTC-5
-const colombiaDate = new Date(now.getTime() - colombiaOffsetMs);
-const colombiaISOString = colombiaDate.toISOString();
+  const colombiaOffsetMs = 5 * 60 * 60 * 1000; // UTC-5
+  const colombiaDate = new Date(now.getTime() - colombiaOffsetMs);
+  const colombiaISOString = colombiaDate.toISOString();
 
   useEffect(() => {
     const header = headerScrollRef.current;
@@ -445,7 +444,9 @@ const colombiaISOString = colombiaDate.toISOString();
           </div>
         )}
       </div>
-
+      <div className="mt-6">
+        <GeneradorSeguimiento citas={citas} selectedDate={selectedDate} />
+      </div>
       {/* Modal para AGREGAR citas */}
       {showForm && selectedCell && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setShowForm(false)}>
@@ -572,6 +573,8 @@ const colombiaISOString = colombiaDate.toISOString();
             </form>
           </div>
         </div>
+
+
       )}
 
       {/* Componente externo con los modales de gestión de citas */}
@@ -593,6 +596,8 @@ const colombiaISOString = colombiaDate.toISOString();
         setSelectedDay={setSelectedDay}
         clientes={clientes}
       />
+
     </div>
+
   );
 }

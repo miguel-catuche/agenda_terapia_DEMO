@@ -1,0 +1,63 @@
+export const estadoLabels = {
+  programada: "Programada",
+  completada: "Completada",
+  cancelada: "Cancelada",
+  "no-se-presento": "No se presentó",
+};
+
+export const motivoLabels = {
+  Terapia: "Terapia",
+  Valoracion: "Valoración",
+};
+
+export const getEstadoColor = (estado) => {
+  switch (estado) {
+    case "cancelada":
+      return "bg-red-400";
+    case "no-se-presento":
+      return "bg-orange-400";
+    case "programada":
+      return "bg-blue-400";
+    case "completada":
+      return "bg-green-400";
+    default:
+      return "bg-gray-200";
+  }
+};
+
+export const getMotivoColor = (motivo) => {
+  switch (motivo) {
+    case "Terapia":
+      return "bg-amber-300";
+    case "Valoracion":
+      return "bg-fuchsia-300";
+    default:
+      return "bg-gray-200";
+  }
+};
+
+export const getMotivoCitas = (motivo) => {
+  switch (motivo) {
+    case "Terapia":
+      return 'bg-amber-100 text-amber-800';
+    case "Valoracion":
+      return 'bg-sky-100 text-sky-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};
+
+export const getEstadoClasses = (estado) => {
+  switch (estado) {
+    case 'cancelada':
+      return 'bg-red-200 border border-red-300 text-red-900 font-semibold';
+    case 'no-se-presento':
+      return 'bg-orange-200 border border-orange-300 text-orange-900 font-semibold';
+    case 'programada':
+      return 'bg-blue-200 border border-blue-300 text-blue-800 font-semibold';
+    case 'completada':
+      return 'bg-green-200 border border-green-300 text-green-900 font-semibold';
+    default:
+      return 'bg-gray-200';
+  }
+};
