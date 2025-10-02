@@ -129,7 +129,7 @@ const CitasModal = ({
       {showModal && selectedDay && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-[28rem] max-h-[80vh] flex flex-col">
-            <h3 className="font-bold mb-4 text-gray-800">Número de Citas para el {selectedDay} = {citasByDay[getDateForDay(selectedDate, selectedDay)]?.length} </h3>
+            <h3 className="font-bold mb-4 text-gray-800">Número de Citas para el {selectedDay} = {citasByDay[getDateForDay(selectedDate, selectedDay)]?.length || 0} </h3>
             {citasByDay[getDateForDay(selectedDate, selectedDay)]?.length === 0 ? (
               <p className="text-gray-500">No hay citas este día</p>
             ) : (

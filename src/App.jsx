@@ -1,8 +1,6 @@
 // src/App.jsx
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { auth, db } from "./firebase";
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import toast, { Toaster } from "react-hot-toast";
 import Login from "./pages/Login";
 import { supabase } from "./supabaseClient";
@@ -13,20 +11,38 @@ const App = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
+    const getSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      setUser(data?.session?.user || null);
       setLoading(false);
+    };
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
     });
-    return () => unsubscribe();
+
+    getSession();
+    return () => {
+      listener?.subscription?.unsubscribe();
+    };
   }, []);
 
+
   const handleLogin = async (email, password) => {
-    await signInWithEmailAndPassword(auth, email, password);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      toast.error("Credenciales inválidas");
+    } else {
+      toast.success("Inicio de sesión exitoso");
+      setUser(data.user);
+    }
   };
 
   const handleLogout = async () => {
-    await signOut(auth);
+    await supabase.auth.signOut();
+    setUser(null);
   };
+
 
   if (loading) return <p className="text-center mt-10">Cargando...</p>;
 
