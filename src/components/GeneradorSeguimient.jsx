@@ -87,86 +87,127 @@ const GeneradorSeguimiento = ({ citas }) => {
 
 
     const handleDescargarPDF = () => {
-        console.log("Ejemplo de cita:", citas[0]);
-        console.log("Citas filtradas:", citasFiltradas);
 
         if (citasFiltradas.length === 0) {
             toast.error("No hay citas para exportar");
             return;
         }
+        const mesesTexto = [
+            "enero", "febrero", "marzo", "abril", "mayo", "junio",
+            "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+        ];
 
-        generarPDFCitas(citasFiltradas, modo); // 👈 ahora pasamos el modo
+        const formatoFechaCorta = (fechaStr) => {
+            const [año, mes, día] = fechaStr.split("-");
+            return `${día}${mes}`;
+        };
+
+        const titulo =
+            modo === "mes"
+                ? `SEGUIMIENTO MENSUAL DE CITAS - ${mesesTexto[Number(mes) - 1].toUpperCase()} ${año}`
+                : `SEGUIMIENTO SEMANAL DE CITAS - ${semanaActual.label.toUpperCase()}`;
+
+        const nombreArchivo =
+            modo === "mes"
+                ? `seguimiento_mensual_${mesesTexto[Number(mes) - 1]}_${año}.pdf`
+                : `seguimiento_semanal_${formatoFechaCorta(semanaActual.inicio.toISOString().slice(0, 10))}_${formatoFechaCorta(semanaActual.fin.toISOString().slice(0, 10))}.pdf`;
+
+
+        generarPDFCitas(citasFiltradas, modo, { titulo, nombreArchivo });
     };
 
 
     return (
-        <div className="bg-white rounded-xl shadow p-4 flex flex-col gap-4 items-center">
-            <h3 className="text-lg font-semibold text-gray-800">Generar seguimiento institucional</h3>
+        <div className="bg-white rounded-xl shadow p-4 flex flex-col gap-4 items-center w-full max-w-3xl mx-auto">
+            <h3 className="text-lg font-semibold text-gray-800 text-center">
+                Descargar seguimiento mensual o semanal
+            </h3>
 
-            <div className="flex flex-wrap gap-2 w-full justify-center">
-                <select
-                    value={modo}
-                    onChange={(e) => setModo(e.target.value)}
-                    className="border rounded-lg px-3 py-2 text-sm"
-                >
-                    <option value="semana">Semana actual</option>
-                    <option value="mes">Mes específico</option>
-                </select>
+            {/* Selector de modo */}
+            <select
+                value={modo}
+                onChange={(e) => setModo(e.target.value)}
+                className="border rounded-lg px-1 py-2 text-sm w-full md:w-auto"
+            >
+                <option value="semana">Semana</option>
+                <option value="mes">Mes</option>
+            </select>
 
-                {modo === "semana" && (
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => setSelectedDate(prev => new Date(prev.setDate(prev.getDate() - 7)))}
-                            className="px-2 py-1 border rounded text-sm"
-                        >
-                            ← Semana anterior
-                        </button>
+            {/* Controles según el modo */}
+            {modo === "semana" && (
+                <div className="flex flex-wrap gap-2 items-center justify-center w-full">
+                    <button
+                        onClick={() =>
+                            setSelectedDate(prev => {
+                                const nueva = new Date(prev);
+                                nueva.setDate(nueva.getDate() - 7);
+                                return nueva;
+                            })
+                        }
+                        className="px-3 py-2 border rounded text-sm w-full md:w-auto"
+                    >
+                        ← Semana anterior
+                    </button>
 
-                        <div className="px-3 py-2 text-sm text-gray-700 font-medium">
-                            {semanaActual.label}
-                        </div>
-
-                        <button
-                            onClick={() => setSelectedDate(prev => new Date(prev.setDate(prev.getDate() + 7)))}
-                            className="px-2 py-1 border rounded text-sm"
-                        >
-                            Semana siguiente →
-                        </button>
+                    <div className="px-3 py-2 text-sm text-gray-700 font-medium text-center">
+                        {semanaActual.label}
                     </div>
-                )}
-                {modo === "mes" && (
-                    <>
-                        <select
-                            value={mes}
-                            onChange={(e) => setMes(e.target.value)}
-                            className="border rounded-lg px-3 py-2 text-sm"
-                        >
-                            {meses.map(m => (
-                                <option key={m.value} value={m.value}>{m.label}</option>
-                            ))}
-                        </select>
 
-                        <select
-                            value={año}
-                            onChange={(e) => setAño(e.target.value)}
-                            className="border rounded-lg px-3 py-2 text-sm"
-                        >
-                            {años.map(a => (
-                                <option key={a} value={a}>{a}</option>
-                            ))}
-                        </select>
-                    </>
-                )}
-            </div>
+                    <button
+                        onClick={() =>
+                            setSelectedDate(prev => {
+                                const nueva = new Date(prev);
+                                nueva.setDate(nueva.getDate() + 7);
+                                return nueva;
+                            })
+                        }
+                        className="px-3 py-2 border rounded text-sm w-full md:w-auto"
+                    >
+                        Semana siguiente →
+                    </button>
 
+                    <button
+                        onClick={() => setSelectedDate(new Date())}
+                        className="px-3 py-2 border rounded text-sm text-blue-600 hover:bg-blue-50 w-full md:w-auto"
+                    >
+                        Hoy
+                    </button>
+                </div>
+            )}
+
+            {modo === "mes" && (
+                <div className="flex flex-wrap gap-2 items-center justify-center w-full">
+                    <select
+                        value={mes}
+                        onChange={(e) => setMes(e.target.value)}
+                        className="border rounded-lg px-3 py-2 text-sm w-full md:w-auto"
+                    >
+                        {meses.map(m => (
+                            <option key={m.value} value={m.value}>{m.label}</option>
+                        ))}
+                    </select>
+
+                    <select
+                        value={año}
+                        onChange={(e) => setAño(e.target.value)}
+                        className="border rounded-lg px-3 py-2 text-sm w-full md:w-auto"
+                    >
+                        {años.map(a => (
+                            <option key={a} value={a}>{a}</option>
+                        ))}
+                    </select>
+                </div>
+            )}
+
+            {/* Botón de descarga */}
             <button
                 onClick={handleDescargarPDF}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
+                className="cursor-pointer bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700 transition w-full md:w-auto"
             >
                 Descargar PDF
             </button>
-
         </div>
+
     );
 };
 

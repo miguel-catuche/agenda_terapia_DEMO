@@ -139,7 +139,7 @@ const ClientesPage = () => {
         if (clientes.length > 0) {
             const seleccion = [...clientes]
                 .sort(() => Math.random() - 0.5) // mezcla el array
-                .slice(0, 10); // toma solo 10
+                .slice(0, 15); // toma solo 10
             setClientesAleatorios(seleccion);
         }
     }, [clientes]);
@@ -154,21 +154,6 @@ const ClientesPage = () => {
             c.telefono?.includes(debouncedQuery)
         );
     }, [clientes, debouncedQuery]);
-
-
-    const pdfRef = useRef();
-
-    const handlePrint = () => {
-        const element = pdfRef.current;
-        const opt = {
-            margin: 0.5,
-            filename: `historial-${selectedClient?.nombre || "cliente"}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
-    };
 
 
     return (

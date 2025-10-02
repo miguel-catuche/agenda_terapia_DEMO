@@ -210,7 +210,7 @@ export const generarPDFHistorial = (cliente, citas) => {
     }
   }
 
-  const nombreArchivo = `registro_${
+  const nombreArchivo = `registro_historico_${
     cliente?.nombre?.replace(/\s+/g, "_") || "paciente"
   }.pdf`;
   doc.save(nombreArchivo);

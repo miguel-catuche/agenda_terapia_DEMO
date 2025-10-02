@@ -1,13 +1,9 @@
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-export const generarPDFCitas = (citas = [], modo = "semana") => {
-  const titulo =
-    modo === "mes"
-      ? "SEGUIMIENTO MENSUAL DE CITAS"
-      : "SEGUIMIENTO SEMANAL DE CITAS";
-  const nombreArchivo =
-    modo === "mes" ? "seguimiento_mensual.pdf" : "seguimiento_semanal.pdf";
+export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
+  const { titulo = "SEGUIMIENTO DE CITAS", nombreArchivo = "seguimiento.pdf" } =
+    opciones;
 
   const estadoLabels = {
     programada: "Programada",
@@ -101,7 +97,7 @@ export const generarPDFCitas = (citas = [], modo = "semana") => {
   doc.setDrawColor(0);
   doc.setFillColor(255, 243, 168);
   doc.rect(40, seguimientoY, 520, 20, "FD");
-  doc.text(`1. ${titulo}`, 300, seguimientoY + 14, {
+  doc.text(`${titulo}`, 300, seguimientoY + 14, {
     align: "center",
   });
 
@@ -135,15 +131,18 @@ export const generarPDFCitas = (citas = [], modo = "semana") => {
     didDrawPage: (data) => {
       const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
       if (currentPage > 1) {
-        const y = data.settings.margin.top;
+        data.settings.margin.top = 100;
         doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
         doc.setDrawColor(0);
         doc.setFillColor(255, 243, 168);
-        doc.rect(40, y, 520, 20, "FD");
-        doc.text(`1. ${titulo}`, 300, y + 14, {
-          align: "center",
-        });
+        const offsetY = y - 20;
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.setDrawColor(0);
+        doc.setFillColor(255, 243, 168);
+        doc.rect(40, offsetY, 520, 20, "FD");
+        doc.text(`${titulo}`, 300, offsetY + 14, { align: "center" });
       }
     },
   });

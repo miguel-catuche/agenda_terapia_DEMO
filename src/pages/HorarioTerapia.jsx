@@ -422,7 +422,9 @@ export default function HorarioMedico() {
                             <Icon name={"plus"} size={20} />Añadir Nuevo
                           </p>
                         ) : tieneCitas ? (
-                          <p className="font-semibold text-gray-800">{citasEnCelda.length} cita(s)</p>
+                          <p className="font-semibold text-gray-800">
+                             {citasEnCelda.length} {citasEnCelda.length === 1 ? "cita" : "citas"}
+                            </p>
                         ) : (
                           <p className="text-gray-500">Sin citas</p>
                         )}

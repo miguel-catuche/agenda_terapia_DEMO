@@ -4,22 +4,17 @@ import Icon from "@/components/Icons";
 import { useClientes } from "@/hooks/useClientes";
 import { useCitas } from "@/hooks/useCitas";
 import ExportadorMensual from "@/components/ExportadorMensual";
+
 const Metricas = () => {
     const { clientes } = useClientes();
-    const { citas } = useCitas();
-
     const hoy = new Date();
-    const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
-    const citasHoy = citas.filter(cita => cita.fecha === hoyStr);
 
     const getSemanaRange = (baseDate) => {
         const base = new Date(baseDate);
-        const dow = base.getDay(); // 0 = domingo
+        const dow = base.getDay();
         const offsetToMonday = dow === 0 ? -6 : 1 - dow;
-
         const monday = new Date(base);
         monday.setDate(base.getDate() + offsetToMonday);
-
         const friday = new Date(monday);
         friday.setDate(monday.getDate() + 4);
 
@@ -32,109 +27,66 @@ const Metricas = () => {
         };
     };
 
+    const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
     const { startDateStr, endDateStr } = getSemanaRange(hoy);
 
-    const citasSemana = citas.filter(cita =>
-        typeof cita.fecha === "string" &&
-        cita.fecha >= startDateStr &&
-        cita.fecha <= endDateStr
-    );
+    const mesInicio = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-01`;
+    const mesFin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).toISOString().slice(0, 10);
+
+    const { citas: citasSemana } = useCitas(startDateStr, endDateStr);
+    const { citas: citasMes } = useCitas(mesInicio, mesFin);
+    const { citas: citasHoy } = useCitas(hoyStr, hoyStr);
+
+    const normalizar = (estado) => estado?.toLowerCase().replace(/\s/g, "-");
 
     const agendadasSemana = citasSemana.length;
-    const programadaSemana = citasSemana.filter(c => c.estado === "programada").length;
-    const completadasSemana = citasSemana.filter(c => c.estado === "completada").length;
-    const canceladasSemana = citasSemana.filter(c => c.estado === "cancelada").length;
-    const noPresentadoSemana = citasSemana.filter(c => c.estado === "no-se-presento").length;
-
-
-    const mesActual = hoy.getMonth();
-    const añoActual = hoy.getFullYear();
-
-    const citasMes = citas.filter(cita => {
-        if (typeof cita.fecha !== "string") return false;
-        const [y, m] = cita.fecha.split("-").map(Number);
-        return y === añoActual && m - 1 === mesActual;
-    });
+    const programadaSemana = citasSemana.filter(c => normalizar(c.estado) === "programada").length;
+    const completadasSemana = citasSemana.filter(c => normalizar(c.estado) === "completada").length;
+    const canceladasSemana = citasSemana.filter(c => normalizar(c.estado) === "cancelada").length;
+    const noPresentadoSemana = citasSemana.filter(c => normalizar(c.estado) === "no-se-presento").length;
 
     const agendadasMes = citasMes.length;
-    const programadaMes = citasMes.filter(c => c.estado === "programada").length;
-    const completadasMes = citasMes.filter(c => c.estado === "completada").length;
-    const canceladasMes = citasMes.filter(c => c.estado === "cancelada").length;
-    const noPresentadoMes = citasMes.filter(c => c.estado === "no-se-presento").length;
+    const programadaMes = citasMes.filter(c => normalizar(c.estado) === "programada").length;
+    const completadasMes = citasMes.filter(c => normalizar(c.estado) === "completada").length;
+    const canceladasMes = citasMes.filter(c => normalizar(c.estado) === "cancelada").length;
+    const noPresentadoMes = citasMes.filter(c => normalizar(c.estado) === "no-se-presento").length;
 
-    // Totales semanales
     const nuevosSemana = clientes.filter(c => {
         if (!c.created_at) return false;
         const fecha = new Date(c.created_at);
         const inicio = new Date(`${startDateStr}T00:00:00`);
         const fin = new Date(`${endDateStr}T23:59:59`);
         return fecha >= inicio && fecha <= fin;
-    }).length;
+    });
 
+    const nuevosSemanaTerapia = nuevosSemana.filter(c => c.motivo === "Terapia").length;
+    const nuevosSemanaValoracion = nuevosSemana.filter(c => c.motivo === "Valoracion").length;
 
-    const nuevosSemanaTerapia = clientes.filter(c => {
-        if (!c.created_at) return false;
-        const fecha = new Date(c.created_at);
-        const inicio = new Date(`${startDateStr}T00:00:00`);
-        const fin = new Date(`${endDateStr}T23:59:59`);
-        return fecha >= inicio && fecha <= fin;
-    }).length;
-
-    const nuevosSemanaValoracion = clientes.filter(c => {
-        if (!c.created_at) return false;
-        const fecha = new Date(c.created_at);
-        const inicio = new Date(`${startDateStr}T00:00:00`);
-        const fin = new Date(`${endDateStr}T23:59:59`);
-        return fecha >= inicio && fecha <= fin;
-    }).length;
-
-    // Totales mensuales
     const nuevosMes = clientes.filter(c => {
         if (!c.created_at) return false;
         const fecha = new Date(c.created_at);
-        return fecha.getMonth() === mesActual && fecha.getFullYear() === añoActual;
-    }).length;
+        return fecha.getMonth() === hoy.getMonth() && fecha.getFullYear() === hoy.getFullYear();
+    });
 
-    const nuevosMesTerapia = clientes.filter(c => {
-        if (!c.created_at) return false;
-        const fecha = new Date(c.created_at);
-        return (
-            fecha.getMonth() === mesActual &&
-            fecha.getFullYear() === añoActual &&
-            c.motivo === "Terapia"
-        );
-    }).length;
-
-    const nuevosMesValoracion = clientes.filter(c => {
-        if (!c.created_at) return false;
-        const fecha = new Date(c.created_at);
-        return (
-            fecha.getMonth() === mesActual &&
-            fecha.getFullYear() === añoActual &&
-            c.motivo === "Valoracion"
-        );
-    }).length;
-
+    const nuevosMesTerapia = nuevosMes.filter(c => c.motivo === "Terapia").length;
+    const nuevosMesValoracion = nuevosMes.filter(c => c.motivo === "Valoracion").length;
 
     return (
         <div className="flex flex-col gap-6 p-4">
             {/* Top metrics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {/* Citas hoy */}
                 <div className="bg-white shadow-sm hover:shadow-md transition-shadow rounded-xl p-4 flex flex-col items-center justify-center text-center">
                     <Icon name="calendar" className="text-green-500 text-2xl mb-2" />
                     <span className="text-3xl font-bold text-gray-800">{citasHoy.length}</span>
                     <p className="text-sm text-gray-500 mt-1">Citas hoy</p>
                 </div>
 
-                {/* Pacientes registrados */}
                 <div className="bg-white shadow-sm hover:shadow-md transition-shadow rounded-xl p-4 flex flex-col items-center justify-center text-center">
                     <Icon name="people" className="text-blue-500 text-2xl mb-2" />
                     <span className="text-3xl font-bold text-gray-800">{clientes.length}</span>
                     <p className="text-sm text-gray-500 mt-1">Pacientes registrados</p>
                 </div>
 
-                {/* Terapia */}
                 <div className="bg-white shadow-sm hover:shadow-md transition-shadow rounded-xl p-4 flex flex-col items-center justify-center text-center">
                     <Icon name="people" className="text-purple-500 text-2xl mb-2" />
                     <span className="text-3xl font-bold text-gray-800">
@@ -143,7 +95,6 @@ const Metricas = () => {
                     <p className="text-sm text-gray-500 mt-1">Pacientes por terapia</p>
                 </div>
 
-                {/* Valoración */}
                 <div className="bg-white shadow-sm hover:shadow-md transition-shadow rounded-xl p-4 flex flex-col items-center justify-center text-center">
                     <Icon name="people" className="text-orange-500 text-2xl mb-2" />
                     <span className="text-3xl font-bold text-gray-800">
@@ -153,10 +104,7 @@ const Metricas = () => {
                 </div>
             </div>
 
-
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Resumen semanal */}
                 <div className="bg-yellow-50 rounded-xl shadow p-4 w-full">
                     <h3 className="text-yellow-700 font-semibold text-lg mb-4">Resumen semanal</h3>
                     <div className="flex flex-col gap-6 w-full">
@@ -172,7 +120,7 @@ const Metricas = () => {
                         />
                         <DonutCard
                             titulo="Clientes nuevos"
-                            total={nuevosSemana}
+                            total={nuevosSemana.length}
                             data={[
                                 { label: "Terapia", value: nuevosSemanaTerapia },
                                 { label: "Valoración", value: nuevosSemanaValoracion },
@@ -181,7 +129,6 @@ const Metricas = () => {
                     </div>
                 </div>
 
-                {/* Resumen mensual */}
                 <div className="bg-purple-50 rounded-xl shadow p-4 w-full">
                     <h3 className="text-purple-700 font-semibold text-lg mb-4">Resumen mensual</h3>
                     <div className="flex flex-col gap-6 w-full">
@@ -197,7 +144,7 @@ const Metricas = () => {
                         />
                         <DonutCard
                             titulo="Clientes nuevos"
-                            total={nuevosMes}
+                            total={nuevosMes.length}
                             data={[
                                 { label: "Terapia", value: nuevosMesTerapia },
                                 { label: "Valoración", value: nuevosMesValoracion },
@@ -206,11 +153,11 @@ const Metricas = () => {
                     </div>
                 </div>
             </div>
+
             <div className="mt-6">
-                <ExportadorMensual citas={citas} clientes={clientes} />
+                <ExportadorMensual citas={citasMes} clientes={clientes} />
             </div>
         </div>
-
     );
 };
 
