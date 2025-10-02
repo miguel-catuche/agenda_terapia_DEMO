@@ -1,49 +1,16 @@
-import React, { useMemo, useState, useRef, useEffect } from "react";
-import html2pdf from "html2pdf.js";
-import HistorialSemanalDocumento from "./HistorialSemanalDocumento";
+import React, { useMemo, useState, useEffect } from "react";
+import { supabase } from "@/supabaseClient";
+import { generarPDFCitas } from "./utils/generarPDFCitas";
+import toast from "react-hot-toast";
 
-const GeneradorSeguimiento = ({ citas, selectedDate }) => {
+const GeneradorSeguimiento = ({ citas }) => {
     const hoy = new Date();
+    const años = Array.from({ length: 5 }, (_, i) => String(hoy.getFullYear() - 2 + i));
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [citasMensuales, setCitasMensuales] = useState([]);
     const [modo, setModo] = useState("semana");
     const [mes, setMes] = useState(String(hoy.getMonth() + 1).padStart(2, "0"));
     const [año, setAño] = useState(String(hoy.getFullYear()));
-    const docRef = useRef(null);
-    const [renderDocumento, setRenderDocumento] = useState(false);
-
-    const años = Array.from({ length: 5 }, (_, i) => String(hoy.getFullYear() - 2 + i));
-
-    const meses = [
-        { label: "Enero", value: "01" },
-        { label: "Febrero", value: "02" },
-        { label: "Marzo", value: "03" },
-        { label: "Abril", value: "04" },
-        { label: "Mayo", value: "05" },
-        { label: "Junio", value: "06" },
-        { label: "Julio", value: "07" },
-        { label: "Agosto", value: "08" },
-        { label: "Septiembre", value: "09" },
-        { label: "Octubre", value: "10" },
-        { label: "Noviembre", value: "11" },
-        { label: "Diciembre", value: "12" },
-    ];
-
-    useEffect(() => {
-        if (renderDocumento && docRef.current) {
-            const opt = {
-                margin: 0.5,
-                filename: "seguimiento_semanal.pdf",
-                image: { type: "jpeg", quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-            };
-
-            // Espera breve para asegurar render completo
-            setTimeout(() => {
-                html2pdf().set(opt).from(docRef.current).save();
-                setRenderDocumento(false);
-            }, 500);
-        }
-    }, [renderDocumento]);
 
     const semanaActual = useMemo(() => {
         const getWeekRange = (date) => {
@@ -62,27 +29,74 @@ const GeneradorSeguimiento = ({ citas, selectedDate }) => {
         return getWeekRange(selectedDate);
     }, [selectedDate]);
 
+    useEffect(() => {
+        const cargarCitas = async () => {
+            let inicio, fin;
+
+            if (modo === "semana") {
+                inicio = semanaActual.inicio.toISOString().slice(0, 10);
+                fin = semanaActual.fin.toISOString().slice(0, 10);
+            } else {
+                const getUltimoDiaDelMes = (año, mes) =>
+                    new Date(Number(año), Number(mes), 0).toISOString().slice(0, 10);
+
+                inicio = `${año}-${mes}-01`;
+                fin = getUltimoDiaDelMes(año, mes);
+            }
+
+            const { data, error } = await supabase
+                .from("citas")
+                .select("*, cliente:clientes(id, nombre)")
+                .gte("fecha", inicio)
+                .lte("fecha", fin)
+                .order("fecha", { ascending: true });
+
+            if (!error) {
+                setCitasMensuales(data);
+            } else {
+                console.error("Error al cargar citas:", error.message);
+                setCitasMensuales([]);
+            }
+        };
+
+        cargarCitas();
+    }, [modo, semanaActual, mes, año]);
+
+
+
+    const meses = [
+        { label: "Enero", value: "01" },
+        { label: "Febrero", value: "02" },
+        { label: "Marzo", value: "03" },
+        { label: "Abril", value: "04" },
+        { label: "Mayo", value: "05" },
+        { label: "Junio", value: "06" },
+        { label: "Julio", value: "07" },
+        { label: "Agosto", value: "08" },
+        { label: "Septiembre", value: "09" },
+        { label: "Octubre", value: "10" },
+        { label: "Noviembre", value: "11" },
+        { label: "Diciembre", value: "12" },
+    ];
+
+
     const citasFiltradas = useMemo(() => {
-        if (modo === "semana") {
-            return citas.filter(c => {
-                const fecha = new Date(`${c.fecha}T${c.hora}`);
-                return fecha >= semanaActual.inicio && fecha <= semanaActual.fin;
-            });
-        } else {
-            const filtro = `${año}-${mes}`;
-            return citas.filter(c => c.fecha?.startsWith(filtro));
-        }
-    }, [modo, citas, semanaActual, mes, año]);
+        return citasMensuales;
+    }, [citasMensuales]);
+
+
 
     const handleDescargarPDF = () => {
+        console.log("Ejemplo de cita:", citas[0]);
+        console.log("Citas filtradas:", citasFiltradas);
+
         if (citasFiltradas.length === 0) {
-            alert("No hay citas para exportar");
+            toast.error("No hay citas para exportar");
             return;
         }
 
-        setRenderDocumento(true);
+        generarPDFCitas(citasFiltradas, modo); // 👈 ahora pasamos el modo
     };
-
 
 
     return (
@@ -100,11 +114,26 @@ const GeneradorSeguimiento = ({ citas, selectedDate }) => {
                 </select>
 
                 {modo === "semana" && (
-                    <div className="px-3 py-2 text-sm text-gray-700 font-medium">
-                        {semanaActual.label}
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setSelectedDate(prev => new Date(prev.setDate(prev.getDate() - 7)))}
+                            className="px-2 py-1 border rounded text-sm"
+                        >
+                            ← Semana anterior
+                        </button>
+
+                        <div className="px-3 py-2 text-sm text-gray-700 font-medium">
+                            {semanaActual.label}
+                        </div>
+
+                        <button
+                            onClick={() => setSelectedDate(prev => new Date(prev.setDate(prev.getDate() + 7)))}
+                            className="px-2 py-1 border rounded text-sm"
+                        >
+                            Semana siguiente →
+                        </button>
                     </div>
                 )}
-
                 {modo === "mes" && (
                     <>
                         <select
@@ -136,12 +165,6 @@ const GeneradorSeguimiento = ({ citas, selectedDate }) => {
             >
                 Descargar PDF
             </button>
-
-            {renderDocumento && (
-                <div ref={docRef} style={{ position: "absolute", left: "-9999px", top: 0 }}>
-                    <HistorialSemanalDocumento citas={citasFiltradas} />
-                </div>
-            )}
 
         </div>
     );

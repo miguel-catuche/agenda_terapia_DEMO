@@ -445,7 +445,7 @@ export default function HorarioMedico() {
         )}
       </div>
       <div className="mt-6">
-        <GeneradorSeguimiento citas={citas} selectedDate={selectedDate} />
+        <GeneradorSeguimiento citas={citas}/>
       </div>
       {/* Modal para AGREGAR citas */}
       {showForm && selectedCell && (
