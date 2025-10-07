@@ -9,9 +9,9 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useClientes } from '@/hooks/useClientes';
 import Icon from '@/components/Icons';
 import toast from 'react-hot-toast';
-import html2pdf from 'html2pdf.js';
 import { generarPDFHistorial } from '@/components/utils/generarPDFHistorial';
-import HistorialDocumento from '@/components/HistorialDocumento';
+import { useClienteServicio } from '@/hooks/useClienteServicio';
+import { useServicioLabels } from '@/helpers/useServicioLabels';
 import { estadoLabels, getEstadoColor, getMotivoColor, motivoLabels } from '@/helpers/colorHelper';
 
 const ClientesPage = () => {
@@ -36,8 +36,21 @@ const ClientesPage = () => {
     const currentYear = new Date().getFullYear();
     const startDate = `${currentYear}-01-01`;
     const endDate = `${currentYear}-12-31`;
+    const { servicios, asignarServicio, eliminarServicio } = useClienteServicio(selectedClient?.id);
     const { citas, loading, refetch } = useCitas(startDate, endDate);
+    const { servicioLabels, getLabel } = useServicioLabels();
+    const [showAddServicioModal, setShowAddServicioModal] = useState(false);
+    const [nuevoServicio, setNuevoServicio] = useState("");
+    const [servicioDetalle, setServicioDetalle] = useState(null);
+    const [modoHistorial, setModoHistorial] = useState("resumen");
 
+
+
+    const openAddService = (cliente) => {
+        setSelectedClient(cliente);
+        setNuevoServicio("");
+        setShowAddServicioModal(true);
+    };
 
     const openAddModal = () => {
         setFormData({ id: '', nombre: '', motivo: '', telefono: '' });
@@ -90,6 +103,7 @@ const ClientesPage = () => {
         if (success) {
             setShowAddModal(false);
             setFormData({ id: "", nombre: "", motivo: "", telefono: "" });
+            openAddService({ id, nombre, motivo });
         }
     };
 
@@ -124,7 +138,7 @@ const ClientesPage = () => {
 
     const historialCitas = Array.isArray(citas) && selectedClient?.id
         ? [...citas]
-            .filter((cita) => `${cita.cliente_id}` === `${selectedClient.id}`)
+            .filter((cita) => cita.clientes_servicio?.cliente_id === selectedClient.id)
             .sort((a, b) => {
                 const getTimestamp = (cita) => {
                     const [year, month, day] = cita.fecha.split("-");
@@ -134,6 +148,7 @@ const ClientesPage = () => {
                 return getTimestamp(b) - getTimestamp(a); // más recientes primero
             })
         : [];
+
 
     useEffect(() => {
         if (clientes.length > 0) {
@@ -155,43 +170,72 @@ const ClientesPage = () => {
         );
     }, [clientes, debouncedQuery]);
 
+    const serviciosDisponibles = {
+        Valoracion: [{ value: "valoracion", label: "Valoración" }],
+        Terapia: [
+            { value: "terapia_fisica", label: "Terapia Física" },
+            { value: "drenaje_linfatico", label: "Drenaje Linfático" },
+            { value: "piso_pelvico", label: "Piso Pélvico" },
+            { value: "terapia_respiratoria", label: "Terapia Respiratoria" },
+        ],
+    };
+
+    const opcionesServicio = selectedClient?.motivo
+        ? serviciosDisponibles[selectedClient.motivo] || []
+        : [];
+
+    const citasPorServicio = historialCitas.reduce((acc, cita) => {
+        const key = cita.clientes_servicio?.servicio;
+        if (!key) return acc;
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(cita);
+        return acc;
+    }, {});
 
     return (
         <div className="p-2 mx-auto">
-
-            <Card className="mb-6">
-                <CardContent className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <Card className="mb-6 py-2">
+                <CardContent className="p-4 space-y-4">
                     <div>
                         <h3 className="text-xl font-semibold text-gray-700">Administración de Clientes</h3>
                         <p className="text-gray-500">Gestiona la información de todos tus pacientes</p>
                     </div>
-                    <div className="flex justify-center md:justify-end">
-                        <Button className={"cursor-pointer gap-2 px-6 py-3 bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all"}
-                            onClick={openAddModal}>
-                            <Icon name={"plus"} />Añadir Nuevo Cliente
-                        </Button>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div
+                            className="cursor-pointer bg-blue-50 hover:bg-blue-100 rounded-xl p-6 shadow-md hover:shadow-lg transition-all flex flex-col items-center text-center space-y-2"
+                            onClick={openAddModal}
+                        >
+                            <div className="bg-blue-100 text-blue-700 rounded-full p-4">
+                                <Icon name="personplus" size={32} />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-800">Registrar Nuevo Usuario</h3>
+                            <p className="text-sm text-gray-600">Agregar un nuevo paciente al sistema</p>
+                        </div>
                     </div>
-                    <div className="flex items-center w-full md:w-64 bg-white border border-gray-300 rounded-lg shadow-sm px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500">
-                        <Icon name="search" className="text-gray-400 mr-2" />
-                        <input
-                            type="text"
-                            placeholder="Buscar cliente..."
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            className="w-full outline-none text-sm text-gray-700 placeholder-gray-400"
-                        />
-                    </div>
-
                 </CardContent>
             </Card>
 
+
             <div className="bg-white rounded-xl shadow-md">
                 <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
-                    <div className="">
-                        <h3 className="text-lg font-bold text-gray-900 mb-1">Lista de Clientes</h3>
-                        <p className="text-sm text-gray-500">{clientes.length} clientes registrados</p>
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-900 mb-1">Lista de Clientes</h3>
+                            <p className="text-sm text-gray-500">{clientes.length} clientes registrados</p>
+                        </div>
+                        <div className="flex items-center w-full md:w-64 bg-white border border-gray-300 rounded-lg shadow-sm px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500">
+                            <Icon name="search" className="text-gray-400 mr-2" />
+                            <input
+                                type="text"
+                                placeholder="Buscar cliente..."
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                className="w-full outline-none text-sm text-gray-700 placeholder-gray-400"
+                            />
+                        </div>
                     </div>
                 </div>
+
                 <Table className={"min-w-full text-sm"}>
                     <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
                         <TableRow className="text-left text-sm font-medium text-gray-700">
@@ -222,13 +266,25 @@ const ClientesPage = () => {
                                 </TableCell>
                                 <TableCell className="px-4 py-3 text-right w-50">
                                     <div className="flex gap-2">
-                                        <Button title="Ver historial" className={"cursor-pointer bg-blue-100 hover:bg-blue-500 text-blue-500 hover:text-white transition-colors"} variant="outline" size="sm" onClick={() => openHistoryModal(cliente)}>
+                                        <Button title="Gestión de Servicios" className={"cursor-pointer bg-amber-200 hover:bg-amber-400 text-amber-700 hover:text-white transition-colors"} variant="outline" size="sm" onClick={() => openAddService(cliente)}>
+                                            <Icon name={"personservices"} />
+                                        </Button>
+                                        <Button
+                                            title="Ver historial"
+                                            className={"cursor-pointer bg-blue-100 hover:bg-blue-500 text-blue-500 hover:text-white transition-colors"} variant="outline" size="sm"
+                                            onClick={() => {
+                                                setSelectedClient(cliente);
+                                                setModoHistorial("resumen");
+                                                setShowHistoryModal(true);
+                                            }}
+                                        >
                                             <Icon name={"calendar"} />
                                         </Button>
-                                        <Button title="Editar" className={"cursor-pointer bg-green-100 hover:bg-green-500 text-green-600 hover:text-white transition-colors"} variant="outline" size="sm" onClick={() => openEditModal(cliente)}>
+
+                                        <Button title="Editar Cliente" className={"cursor-pointer bg-green-100 hover:bg-green-500 text-green-600 hover:text-white transition-colors"} variant="outline" size="sm" onClick={() => openEditModal(cliente)}>
                                             <Icon name={"edit"} />
                                         </Button>
-                                        <Button title="Eliminar" className={"cursor-pointer bg-red-100 hover:bg-red-500 text-red-500 hover:text-white transition-colors"} variant="outline" size="sm" onClick={() => openDeleteModal(cliente)}>
+                                        <Button title="Eliminar Cliente" className={"cursor-pointer bg-red-100 hover:bg-red-500 text-red-500 hover:text-white transition-colors"} variant="outline" size="sm" onClick={() => openDeleteModal(cliente)}>
                                             <Icon name={"delete"} />
                                         </Button>
                                     </div>
@@ -420,44 +476,92 @@ const ClientesPage = () => {
 
             {/* Modal para Ver Historial */}
             {showHistoryModal && selectedClient && (
-
                 <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-
                     <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-[600px]">
+                        {/* Encabezado */}
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
-                            <h3 className="font-bold text-gray-800 text-xl text-center sm:text-left">
-                                Historial de Citas de {selectedClient?.nombre || "Cliente"}
-                            </h3>
+                            <div>
+                                <h3 className="font-bold text-gray-800 text-xl">
+                                    {modoHistorial === "resumen"
+                                        ? "Historial de Servicios"
+                                        : `Historial de Citas de ${selectedClient?.nombre}`}
+                                </h3>
+                                {modoHistorial === "detalle" && servicioDetalle && (
+                                    <p className="text-sm text-gray-500">
+                                        Servicio: {servicioLabels[servicioDetalle] || servicioDetalle}
+                                    </p>
+                                )}
+                            </div>
 
-                            <div className="flex justify-center sm:justify-end gap-2">
-                                {historialCitas.length > 0 && (
+                            <div className="flex gap-2">
+                                {modoHistorial === "detalle" && (
                                     <Button
                                         variant="ghost"
-                                        onClick={() => generarPDFHistorial(selectedClient, historialCitas)}
-                                        className="cursor-pointer hover:text-white bg-blue-600 text-white hover:bg-blue-700"
+                                        onClick={() => {
+                                            const citasFiltradas = citasPorServicio[servicioDetalle] || [];
+                                            generarPDFHistorial(selectedClient, citasFiltradas);
+                                        }}
+                                        className="cursor-pointer bg-blue-600 text-white hover:bg-blue-800 hover:text-white transition-colors"
                                     >
                                         Imprimir
-                                    </Button>                                   
+                                    </Button>
                                 )}
                                 <Button
                                     variant="ghost"
-                                    onClick={() => setShowHistoryModal(false)}
-                                    className="cursor-pointer hover:text-white bg-red-600 text-white hover:bg-red-700"
+                                    onClick={() => {
+                                        setShowHistoryModal(false);
+                                        setModoHistorial("resumen");
+                                        setServicioDetalle(null);
+                                    }}
+                                    className="cursor-pointer bg-red-600 text-white hover:bg-red-700 transition-colors hover:text-white"
                                 >
                                     Cerrar
                                 </Button>
                             </div>
                         </div>
 
-
+                        {/* Contenido */}
                         <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-
-                            {historialCitas.length > 0 ? (
-
-                                historialCitas.map((cita, index) => (
-
+                            {modoHistorial === "resumen" ? (
+                                Object.entries(citasPorServicio).map(([servicio, citas], index) => {
+                                    const sesiones = citas.length;
+                                    const fechaInicio = citas[citas.length - 1]?.fecha || "—";
+                                    return (
+                                        <Card key={index} className="p-4 bg-gray-50">
+                                            <CardContent className="p-0">
+                                                <div className="flex justify-between items-center">
+                                                    <div className="text-sm text-gray-700">
+                                                        <p><strong>Servicio:</strong> {servicioLabels[servicio] || servicio}</p>
+                                                        <p><strong>Sesiones:</strong> {sesiones}</p>
+                                                        <p><strong>Desde:</strong> {fechaInicio}</p>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <Button
+                                                            variant="ghost"
+                                                            onClick={() => {
+                                                                setServicioDetalle(servicio);
+                                                                setModoHistorial("detalle");
+                                                            }}
+                                                            className="cursor-pointer bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
+                                                        >
+                                                            Ver
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            onClick={() => generarPDFHistorial(selectedClient, citas)}
+                                                            className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700 hover:text-white transition-colors"
+                                                        >
+                                                            Imprimir
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                })
+                            ) : (
+                                (citasPorServicio[servicioDetalle] || []).map((cita, index) => (
                                     <Card key={index} className="p-4 bg-gray-50">
-
                                         <CardContent className="p-0">
                                             <div className="flex justify-between items-center">
                                                 <div className="text-sm text-gray-700">
@@ -474,15 +578,111 @@ const ClientesPage = () => {
                                         </CardContent>
                                     </Card>
                                 ))
-                            ) : (
-                                <div className="text-center text-gray-500">
-                                    <p>No se encontraron citas para este cliente.</p>
-                                </div>
                             )}
                         </div>
                     </div>
                 </div>
             )}
+
+
+
+            {/* Modal para añadir servicio */}
+            {showAddServicioModal && selectedClient && (
+                <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96">
+                        <h3 className="font-bold mb-4 text-gray-800 text-center">
+                            Gestión de Servicios
+                        </h3>
+                        <form
+                            onSubmit={async (e) => {
+                                e.preventDefault();
+                                if (!nuevoServicio) return;
+                                const success = await asignarServicio(nuevoServicio);
+                                if (success) {
+                                    setNuevoServicio("");
+                                    setShowAddServicioModal(false);
+                                }
+                            }}
+                            className="space-y-4"
+                        >
+                            {/* Nombre del paciente */}
+                            <div>
+                                <label className="block text-sm text-gray-700">Nombre del paciente</label>
+                                <Input
+                                    type="text"
+                                    value={selectedClient.nombre}
+                                    readOnly
+                                    className="bg-gray-100 cursor-not-allowed"
+                                />
+                            </div>
+
+                            {/* Documento del paciente */}
+                            <div>
+                                <label className="block text-sm text-gray-700">Número de documento</label>
+                                <Input
+                                    type="text"
+                                    value={selectedClient.id}
+                                    readOnly
+                                    className="bg-gray-100 cursor-not-allowed"
+                                />
+                            </div>
+
+                            {/* Select de servicio */}
+                            <div>
+
+                                {servicios.length > 0 && (
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Servicios ya asignados</label>
+                                        <ul className="space-y-1">
+                                            {servicios.map((s) => (
+                                                <li key={s.id} className="flex items-center justify-between bg-gray-50 px-3 py-1 rounded text-sm text-gray-700 border border-gray-200">
+                                                    <span>{servicioLabels[s.servicio] || s.servicio}</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => eliminarServicio(s.id)}
+                                                        className="text-red-500 hover:text-red-700 text-xs font-medium"
+                                                    >
+                                                        Eliminar
+                                                    </button>
+
+
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                                <label className="block text-sm text-gray-700">Servicio</label>
+                                <select
+                                    value={nuevoServicio}
+                                    onChange={(e) => setNuevoServicio(e.target.value)}
+                                    required
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800"
+                                >
+                                    <option value="" disabled>Selecciona un servicio</option>
+                                    {opcionesServicio.map((op) => (
+                                        <option key={op.value} value={op.value}>
+                                            {op.label}
+                                        </option>
+                                    ))}
+                                </select>
+
+                            </div>
+
+                            {/* Botones */}
+                            <div className="flex justify-end space-x-2">
+                                <Button type="button" className={"cursor-pointer "} variant="outline" onClick={() => setShowAddServicioModal(false)}>
+                                    Cancelar
+                                </Button>
+                                <Button type="submit" className="cursor-pointer bg-green-600 hover:bg-green-700 text-white">
+                                    Guardar
+                                </Button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            )}
+
         </div>
 
     );

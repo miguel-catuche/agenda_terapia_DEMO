@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getMotivoCitas, estadoLabels, motivoLabels, getEstadoClasses } from "@/helpers/colorHelper";
+import { useClienteServicio } from "@/hooks/useClienteServicio";
 
 const allowedHours = ["07", "08", "09", "10", "14", "15", "16", "17"];
 const allowedMinutes = ["00", "15", "30", "45"];
@@ -32,7 +33,6 @@ const CitasModal = ({
   handleUpdate,
   handleDelete,
   setSelectedCell,
-  clientes
 }) => {
   // SVG del ícono de ojo
   const EyeIcon = () => (
@@ -84,11 +84,11 @@ const CitasModal = ({
             ) : (
               <ul className="text-sm space-y-2 flex flex-col items-start w-full">
                 {citasByDate[`${getDateForDay(selectedDate, selectedCell.day)}-${selectedCell.hour.slice(0, 2)}`]?.map((c) => {
-                  const cliente = clientes?.find((cl) => cl.id === c.cliente_id);
+                  const cliente = c.clientes_servicio?.cliente;
                   return (
                     <li key={c.id} className={`w-full max-w-[22rem] text-left flex justify-between items-center px-4 py-2 rounded-lg ${getEstadoClasses(c.estado)}`}>
                       <div>
-                        {c.nombre} - Hora: {c.hora.slice(0, 5)} - Estado: {estadoLabels[c.estado] || c.estado}
+                        {cliente?.nombre} (Doc: {c.clientes_servicio?.cliente_id}) - Hora: {c.hora.slice(0, 5)}
                         {cliente?.motivo && (
                           <div className={`text-xs mt-1 rounded w-fit px-2 text-center ${getMotivoCitas(cliente.motivo)}`}>
                             Motivo: {motivoLabels[cliente.motivo] || cliente.motivo}
@@ -97,7 +97,14 @@ const CitasModal = ({
                       </div>
                       <div className="flex items-center space-x-2 pl-2">
                         <span onClick={() => {
-                          setSelectedAppointment({ ...c, fecha: c.fecha, hora: c.hora.slice(0, 5) });
+                          setSelectedAppointment({
+                            ...c,
+                            fecha: c.fecha,
+                            hora: c.hora.slice(0, 5),
+                            nombre: cliente?.nombre || '',
+                            cliente_id: c.clientes_servicio?.cliente_id || '',
+                          });
+
                           setShowEditModal(true);
                           setShowModal(false);
                         }}>
@@ -145,11 +152,11 @@ const CitasModal = ({
                         ) : (
                           <ul className="text-sm space-y-2 flex flex-col items-start">
                             {citasHora.map((c) => {
-                              const cliente = clientes?.find((cl) => cl.id === c.cliente_id);
+                              const cliente = c.clientes_servicio?.cliente;
                               return (
                                 <li key={c.id} className={`w-full max-w-[24rem] text-left text-gray-900 flex justify-between items-center px-4 py-2 rounded-lg ${getEstadoClasses(c.estado)}`}>
                                   <div>
-                                    {c.nombre} - Hora: {c.hora.slice(0, 5)} - Estado: {estadoLabels[c.estado] || c.estado}
+                                    {cliente?.nombre} (Doc: {c.clientes_servicio?.cliente_id}) - Hora: {c.hora.slice(0, 5)}
                                     {cliente?.motivo && (
                                       <div className={`text-xs mt-1 rounded w-fit px-2 text-center ${getMotivoCitas(cliente.motivo)}`}>
                                         Motivo: {motivoLabels[cliente.motivo] || cliente.motivo}
@@ -158,7 +165,14 @@ const CitasModal = ({
                                   </div>
                                   <div className="flex items-center space-x-2">
                                     <span onClick={() => {
-                                      setSelectedAppointment({ ...c, fecha: c.fecha, hora: c.hora.slice(0, 5) });
+                                      setSelectedAppointment({
+                                        ...c,
+                                        fecha: c.fecha,
+                                        hora: c.hora.slice(0, 5),
+                                        nombre: cliente?.nombre || '',
+                                        cliente_id: c.clientes_servicio?.cliente_id || '',
+                                      });
+
                                       setShowEditModal(true);
                                       setShowModal(false);
                                     }}>
@@ -296,8 +310,8 @@ const CitasModal = ({
                     Cancelar
                   </Button>
                   <Button type="button" variant="destructive" onClick={handleDelete} className="cursor-pointer flex-1 hover:bg-red-700">
-                  Eliminar
-                </Button>                  
+                    Eliminar
+                  </Button>
                 </div>
                 <Button type="submit" className="cursor-pointer bg-green-600 hover:bg-green-700">Guardar Cambios</Button>
               </div>

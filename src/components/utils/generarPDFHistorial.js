@@ -1,5 +1,13 @@
 import jsPDF from "jspdf";
-import "jspdf-autotable"; // solo importa, no lo vincules manualmente
+import "jspdf-autotable";
+
+const servicioLabels = {
+  valoracion: "VALORACIÓN",
+  terapia_fisica: "TERAPIA FÍSICA",
+  drenaje_linfatico: "DRENAJE LINFÁTICO",
+  piso_pelvico: "PISO PÉLVICO",
+  terapia_respiratoria: "TERAPIA RESPIRATORIA",
+};
 
 export const generarPDFHistorial = (cliente, citas) => {
   const doc = new jsPDF({
@@ -83,18 +91,24 @@ export const generarPDFHistorial = (cliente, citas) => {
     align: "center",
   });
 
+  const motivo =
+    servicioLabels[citas[0]?.clientes_servicio?.servicio] ||
+    servicioLabels[cliente?.motivo?.toLowerCase()] ||
+    "—";
+
   // Tabla pegada al título, sin espacio
   doc.autoTable({
     startY: seccion1Y + altoSeccion,
     theme: "grid",
     head: null,
     body: [
-      [`EMPRESA: Nombre empresa`, `SERVICIO: TERAPIA Y REHABILITACIÓN FÍSICA`],
+      [`EMPRESA: Nombre empresa`, `SERVICIO: ${motivo}`],
       [
         `PACIENTE: ${cliente?.nombre || "—"}`,
         `Documento de identidad: ${cliente?.id || "—"}`,
       ],
     ],
+
     styles: {
       fontSize: 10,
       halign: "left",

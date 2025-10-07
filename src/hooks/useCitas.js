@@ -1,3 +1,4 @@
+// src/hooks/useCitas.js
 import { useEffect, useState } from "react";
 import { supabase } from "@/supabaseClient";
 
@@ -8,53 +9,57 @@ export const useCitas = (startDate, endDate) => {
   const fetchCitas = async () => {
     setLoading(true);
 
-    const { data: citasData, error: citasError } = await supabase
+    const { data, error } = await supabase
       .from("citas")
-      .select("*")
+      .select(
+        `
+        id,
+        fecha,
+        hora,
+        estado,
+        clientes_servicio_id,
+        clientes_servicio (
+          servicio,
+          cliente_id,
+          cliente:clientes (
+            nombre,
+            motivo
+          )
+        )
+      `
+      )
       .gte("fecha", startDate)
       .lte("fecha", endDate)
       .order("fecha", { ascending: true });
 
-    const { data: clientesData, error: clientesError } = await supabase
-      .from("clientes")
-      .select("id, nombre");
-
-    if (citasError || clientesError) {
-      console.error(
-        "Error al cargar citas o clientes:",
-        citasError?.message || clientesError?.message
-      );
+    if (error) {
+      console.error("Error al cargar citas:", error.message);
       setLoading(false);
       return;
     }
 
-    // unir manualmente
-    const citasConCliente = citasData.map((cita) => {
-      const cliente = clientesData.find((c) => c.id === cita.cliente_id);
-      return {
-        ...cita,
-        cliente: cliente || null,
-      };
-    });
-
-    setCitas(citasConCliente);
+    setCitas(data || []);
     setLoading(false);
   };
 
   useEffect(() => {
-    if (startDate === undefined && endDate === undefined) {
-      // permite carga sin fechas
-      fetchCitas();
-    } else if (startDate && endDate) {
-      fetchCitas();
-    }
+    if (!startDate || !endDate) return;
+    fetchCitas();
   }, [startDate, endDate]);
 
   const addCita = async (nuevaCita) => {
-    const { data, error } = await supabase
-      .from("citas")
-      .insert([nuevaCita])
-      .select();
+    const { data, error } = await supabase.from("citas").insert([nuevaCita])
+      .select(`
+        *,
+        clientes_servicio (
+          servicio,
+          cliente_id,
+          cliente:clientes (
+            nombre,
+            motivo
+          )
+        )
+      `);
 
     if (error || !data || !data[0]) {
       console.error(
@@ -72,8 +77,17 @@ export const useCitas = (startDate, endDate) => {
     const { data, error } = await supabase
       .from("citas")
       .update(updatedData)
-      .eq("id", id)
-      .select();
+      .eq("id", id).select(`
+        *,
+        clientes_servicio (
+          servicio,
+          cliente_id,
+          cliente:clientes (
+            nombre,
+            motivo
+          )
+        )
+      `);
 
     if (error || !data || !data[0]) {
       console.error(

@@ -1,4 +1,4 @@
-// src/components/HorarioMedico.jsx
+// src/components/HorarioTerapia.jsx
 import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,9 @@ import Icon from "@/components/Icons";
 import { useCitas } from "@/hooks/useCitas";
 import { useClientes } from "@/hooks/useClientes";
 import { getDateForDay } from "@/helpers/dateHelpers";
+import { useClienteServicio } from "@/hooks/useClienteServicio";
+import { useServicioLabels } from "@/helpers/useServicioLabels";
+import { useClientesServicioGlobal } from "@/hooks/useClientesServicioGlobal";
 import GeneradorSeguimiento from "@/components/GeneradorSeguimient";
 
 const hours = [
@@ -89,9 +92,18 @@ export default function HorarioMedico() {
   const [formData, setFormData] = useState({ hora: "" });
   const { clientes, refetch: refetchClientes } = useClientes();
   const { startDateStr, endDateStr } = getWeekRange(selectedDate);
+  const { getLabel } = useServicioLabels();
   const { citas, addCita, updateCita, deleteCita, refetch: refetchCitas } = useCitas(startDateStr, endDateStr);
+  const { servicios } = useClienteServicio(selectedClient?.id);
+  const { serviciosGlobales } = useClientesServicioGlobal();
+  const clientesConServicio = useMemo(() => {
+    const conServicioIds = new Set(serviciosGlobales.map(s => s.cliente_id));
+    return clientes.filter(c => conServicioIds.has(c.id));
+  }, [clientes, serviciosGlobales]);
   const headerScrollRef = useRef(null);
   const gridScrollRef = useRef(null);
+
+
 
   const now = new Date();
   const colombiaOffsetMs = 5 * 60 * 60 * 1000; // UTC-5
@@ -174,14 +186,14 @@ export default function HorarioMedico() {
       }
 
       const nuevaCita = {
-        cliente_id: selectedClient.id,
-        nombre: selectedClient.nombre,
+        clientes_servicio_id: formData.servicioId,
         fecha: getDateForDay(selectedDate, selectedCell.day),
         hora: hora + ":00",
         estado: "programada",
         created_at: colombiaISOString,
         updated_at: colombiaISOString
       };
+
 
       const success = await addCita(nuevaCita);
       if (success) {
@@ -203,16 +215,16 @@ export default function HorarioMedico() {
     e.preventDefault();
     if (!selectedAppointment?.id) return;
 
-    const { nombre, fecha, hora, estado, cliente_id } = selectedAppointment;
+    const { fecha, hora, estado, clientes_servicio_id } = selectedAppointment;
 
     const citaActualizada = {
-      nombre,
       fecha,
       hora: hora.split(":").length === 2 ? hora + ":00" : hora,
       estado,
-      cliente_id,
+      clientes_servicio_id,
       updated_at: new Date().toISOString()
     };
+
 
     const success = await updateCita(selectedAppointment.id, citaActualizada);
     if (success) {
@@ -259,7 +271,7 @@ export default function HorarioMedico() {
   // Lógica de búsqueda optimizada con debouncing
   const searchClients = useCallback((term) => {
     if (term.length > 0) {
-      const results = clientes.filter(client =>
+      const results = clientesConServicio.filter(client =>
         client.nombre.toLowerCase().includes(term.toLowerCase()) ||
         client.id.includes(term)
       );
@@ -267,7 +279,8 @@ export default function HorarioMedico() {
     } else {
       setSearchResults([]);
     }
-  }, [clientes]);
+  }, [clientesConServicio]); // ← este era el error silencioso
+
 
   const debouncedSearch = useDebounce(searchClients, 300);
 
@@ -423,8 +436,8 @@ export default function HorarioMedico() {
                           </p>
                         ) : tieneCitas ? (
                           <p className="font-semibold text-gray-800">
-                             {citasEnCelda.length} {citasEnCelda.length === 1 ? "cita" : "citas"}
-                            </p>
+                            {citasEnCelda.length} {citasEnCelda.length === 1 ? "Cita" : "Citas"}
+                          </p>
                         ) : (
                           <p className="text-gray-500">Sin citas</p>
                         )}
@@ -447,7 +460,7 @@ export default function HorarioMedico() {
         )}
       </div>
       <div className="mt-6">
-        <GeneradorSeguimiento citas={citas}/>
+        <GeneradorSeguimiento citas={citas} />
       </div>
       {/* Modal para AGREGAR citas */}
       {showForm && selectedCell && (
@@ -478,6 +491,24 @@ export default function HorarioMedico() {
                       className="bg-gray-100 cursor-not-allowed"
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Servicio asignado</label>
+                    <select
+                      value={formData.servicioId || ""}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, servicioId: e.target.value }))}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800"
+                    >
+                      <option value="" disabled>Selecciona un servicio</option>
+                      {servicios.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {getLabel(s.servicio)}
+                        </option>
+
+                      ))}
+                    </select>
+                  </div>
+
                 </>
               ) : (
                 // Buscador de clientes
@@ -596,7 +627,6 @@ export default function HorarioMedico() {
         handleDelete={handleDelete}
         setSelectedCell={setSelectedCell}
         setSelectedDay={setSelectedDay}
-        clientes={clientes}
       />
 
     </div>

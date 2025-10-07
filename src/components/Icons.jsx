@@ -80,6 +80,22 @@ export default function Icon({ name, size = 24, className = "" }) {
         <path d="M4 19h16" />
       </svg>
     ),
+    personplus: (
+      <svg {...commonProps} className={`lucide lucide-user-plus-icon ${className}`}>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <line x1="19" y1="8" x2="19" y2="14" />
+        <line x1="22" y1="11" x2="16" y2="11" />
+      </svg>
+    ),
+    personservices: (
+      <svg {...commonProps} className={`lucide lucide-user-star-icon ${className}`}>
+        <path d="M16.051 12.616a1 1 0 0 1 1.909.024l.737 1.452a1 1 0 0 0 .737.535l1.634.256a1 1 0 0 1 .588 1.806l-1.172 1.168a1 1 0 0 0-.282.866l.259 1.613a1 1 0 0 1-1.541 1.134l-1.465-.75a1 1 0 0 0-.912 0l-1.465.75a1 1 0 0 1-1.539-1.133l.258-1.613a1 1 0 0 0-.282-.866l-1.156-1.153a1 1 0 0 1 .572-1.822l1.633-.256a1 1 0 0 0 .737-.535z" />
+        <path d="M8 15H7a4 4 0 0 0-4 4v2" />
+        <circle cx="10" cy="7" r="4" />
+      </svg>
+    ),
+
   };
 
   return icons[name] || null;
