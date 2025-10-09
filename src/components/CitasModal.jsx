@@ -78,7 +78,8 @@ const CitasModal = ({
           onClick={() => {
             setShowModal(false);
           }}>
-          <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96"
+           onClick={(e) => e.stopPropagation()}>
             <h3 className="font-bold mb-2 text-gray-800">
               Citas en {selectedCell.day} a las {selectedCell.hour.slice(0, 5)}
             </h3>
@@ -141,7 +142,8 @@ const CitasModal = ({
           onClick={() => {
             setShowModal(false);
           }}>
-          <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-[28rem] max-h-[80vh] flex flex-col">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-[28rem] max-h-[80vh] flex flex-col"
+           onClick={(e) => e.stopPropagation()}>
             <h3 className="font-bold mb-4 text-gray-800">Número de Citas para el {selectedDay} = {citasByDay[getDateForDay(selectedDate, selectedDay)]?.length || 0} </h3>
             {citasByDay[getDateForDay(selectedDate, selectedDay)]?.length === 0 ? (
               <p className="text-gray-500">No hay citas este día</p>
@@ -218,7 +220,8 @@ const CitasModal = ({
           onClick={() => {
             setShowEditModal(false);
           }}>
-          <div className="bg-white rounded-xl shadow-lg p-6 w-80 md:w-96">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-80 md:w-96"
+           onClick={(e) => e.stopPropagation()}>
             <h3 className="font-bold mb-4 text-gray-800 text-center">
               Gestionar Cita
             </h3>

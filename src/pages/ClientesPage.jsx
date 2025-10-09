@@ -326,7 +326,8 @@ const ClientesPage = () => {
                     onClick={() => {
                         setShowAddModal(false);
                     }}>
-                    <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96">
+                    <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96"
+                        onClick={(e) => e.stopPropagation()}>
                         <h3 className="font-bold mb-4 text-gray-800 text-center">Añadir Nuevo Cliente</h3>
                         <form onSubmit={handleAddSubmit} className="space-y-3">
                             <div>
@@ -397,7 +398,8 @@ const ClientesPage = () => {
                     onClick={() => {
                         setShowEditModal(false)
                     }} >
-                    <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96">
+                    <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96"
+                        onClick={(e) => e.stopPropagation()}>
                         <h3 className="font-bold mb-4 text-gray-800 text-center">Editar Cliente</h3>
                         <form onSubmit={handleEditSubmit} className="space-y-3">
                             <div>
@@ -502,8 +504,12 @@ const ClientesPage = () => {
             {/* Modal para Ver Historial */}
             {
                 showHistoryModal && selectedClient && (
-                    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-                        <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-[600px]">
+                    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50"
+                        onClick={() => {
+                            setShowHistoryModal(false)
+                        }} >
+                        <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-[600px]"
+                            onClick={(e) => e.stopPropagation()}>
                             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
                                 <div>
                                     <h3 className="font-bold text-gray-800 text-xl">
@@ -617,9 +623,11 @@ const ClientesPage = () => {
             {
                 showAddServicioModal && selectedClient && (
                     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50"
-                    onClick={() => {
-                        setShowAddServicioModal(false)}}>
-                        <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96">
+                        onClick={() => {
+                            setShowAddServicioModal(false)
+                        }}>
+                        <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96"
+                            onClick={(e) => e.stopPropagation()}>
                             <h3 className="font-bold mb-4 text-gray-800 text-center">
                                 Gestión de Servicios
                             </h3>
