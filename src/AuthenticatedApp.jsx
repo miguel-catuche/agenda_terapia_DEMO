@@ -6,9 +6,25 @@ import HorarioMedico from "./pages/HorarioTerapia";
 import Metricas from "./pages/Metricas";
 import { AnimatePresence } from "framer-motion";
 import AnimatedPage from "./components/AnimatedPage";
+import Panel from "./components/Panel";
+import useAvisos from "./hooks/useAvisos";
+import { useState} from "react";
+import { supabase } from "./supabaseClient";
+
 
 const AuthenticatedApp = ({ onLogout }) => {
   const location = useLocation();
+  const { avisos, cargando, error, recargar } = useAvisos();
+  const [mostrarAvisos, setMostrarAvisos] = useState(false);
+
+  const handleCrearAviso = async (nuevoAviso) => {
+    const { error } = await supabase.from("avisos").insert(nuevoAviso);
+    if (!error) {
+      recargar(); // ← actualiza los avisos desde la DB
+    } else {
+      console.error("Error al guardar aviso:", error.message);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -50,6 +66,7 @@ const AuthenticatedApp = ({ onLogout }) => {
           </div>
         </div>
       </div>
+      <Panel/>
     </div>
   );
 };

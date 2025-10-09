@@ -58,20 +58,58 @@ export const useClienteServicio = (clienteId) => {
     return true;
   };
 
-  const eliminarServicio = async (servicioId) => {
-    const { error } = await supabase
+  const verificarCitasAsignadas = async (servicioId) => {
+    const { data, error } = await supabase
+      .from("citas")
+      .select("id")
+      .eq("clientes_servicio_id", servicioId)
+      .limit(1);
+
+    if (error) {
+      console.error("Error al verificar citas:", error.message);
+      toast.error("No se pudo verificar si el servicio tiene citas");
+      return { requiereConfirmacion: false, cantidad: 0 };
+    }
+
+    return {
+      requiereConfirmacion: data.length > 0,
+      cantidad: data.length,
+    };
+  };
+
+  const eliminarServicio = async (servicioId, confirmar = false) => {
+    const { requiereConfirmacion } = await verificarCitasAsignadas(servicioId);
+
+    if (requiereConfirmacion && !confirmar) {
+      return "requiere-confirmacion";
+    }
+
+    // Eliminar citas primero
+    const { error: errorCitas } = await supabase
+      .from("citas")
+      .delete()
+      .eq("clientes_servicio_id", servicioId);
+
+    if (errorCitas) {
+      console.error("Error al eliminar citas:", errorCitas.message);
+      toast.error("No se pudieron eliminar las citas");
+      return false;
+    }
+
+    // Luego eliminar el servicio
+    const { error: errorServicio } = await supabase
       .from("clientes_servicio")
       .delete()
       .eq("id", servicioId);
 
-    if (error) {
-      console.error("Error al eliminar servicio:", error.message);
+    if (errorServicio) {
+      console.error("Error al eliminar servicio:", errorServicio.message);
       toast.error("No se pudo eliminar el servicio");
       return false;
     }
 
     setServicios((prev) => prev.filter((s) => s.id !== servicioId));
-    toast.success("Servicio eliminado correctamente");
+    toast.success("Servicio y citas eliminados correctamente");
     return true;
   };
 

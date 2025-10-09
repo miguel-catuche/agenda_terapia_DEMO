@@ -46,10 +46,22 @@ const GeneradorSeguimiento = ({ citas }) => {
 
             const { data, error } = await supabase
                 .from("citas")
-                .select("*, cliente:clientes(id, nombre)")
+                .select(`
+    id,
+    fecha,
+    hora,
+    estado,
+    clientes_servicio (
+      cliente:clientes (
+        id,
+        nombre
+      )
+    )
+  `)
                 .gte("fecha", inicio)
                 .lte("fecha", fin)
                 .order("fecha", { ascending: true });
+
 
             if (!error) {
                 setCitasMensuales(data);

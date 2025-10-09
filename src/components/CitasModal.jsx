@@ -74,7 +74,10 @@ const CitasModal = ({
     <>
       {/* Modal de citas por hora */}
       {showModal && selectedCell && !selectedDay && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={() => {
+            setShowModal(false);
+          }}>
           <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96">
             <h3 className="font-bold mb-2 text-gray-800">
               Citas en {selectedCell.day} a las {selectedCell.hour.slice(0, 5)}
@@ -134,7 +137,10 @@ const CitasModal = ({
 
       {/* Modal de citas por día */}
       {showModal && selectedDay && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={() => {
+            setShowModal(false);
+          }}>
           <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-[28rem] max-h-[80vh] flex flex-col">
             <h3 className="font-bold mb-4 text-gray-800">Número de Citas para el {selectedDay} = {citasByDay[getDateForDay(selectedDate, selectedDay)]?.length || 0} </h3>
             {citasByDay[getDateForDay(selectedDate, selectedDay)]?.length === 0 ? (
@@ -208,7 +214,10 @@ const CitasModal = ({
 
       {/* Modal para EDITAR, ELIMINAR y VER citas (con campos de documento y nombre deshabilitados) */}
       {showEditModal && selectedAppointment && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={() => {
+            setShowEditModal(false);
+          }}>
           <div className="bg-white rounded-xl shadow-lg p-6 w-80 md:w-96">
             <h3 className="font-bold mb-4 text-gray-800 text-center">
               Gestionar Cita

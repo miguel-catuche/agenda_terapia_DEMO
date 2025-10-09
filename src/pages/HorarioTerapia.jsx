@@ -449,15 +449,6 @@ export default function HorarioMedico() {
             ))}
           </div>
         </div>
-
-        {/* Botón de guardar */}
-        {mode === "edit" && (
-          <div className="fixed bottom-6 right-6">
-            <Button onClick={() => setMode("view")} className="bg-green-600 text-white shadow-lg cursor-pointer">
-              Guardar cambios
-            </Button>
-          </div>
-        )}
       </div>
       <div className="mt-6">
         <GeneradorSeguimiento citas={citas} />
