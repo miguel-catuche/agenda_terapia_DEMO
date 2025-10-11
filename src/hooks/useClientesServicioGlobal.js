@@ -5,19 +5,22 @@ import { supabase } from "@/supabaseClient";
 export const useClientesServicioGlobal = () => {
   const [serviciosGlobales, setServiciosGlobales] = useState([]);
 
+  const fetchServicios = async () => {
+    const { data, error } = await supabase
+      .from("clientes_servicio")
+      .select("id, cliente_id, servicio");
+
+    if (!error) {
+      setServiciosGlobales(data || []);
+    }
+  };
+
   useEffect(() => {
-    const fetchServicios = async () => {
-      const { data, error } = await supabase
-        .from("clientes_servicio")
-        .select("id, cliente_id, servicio");
-
-      if (!error) {
-        setServiciosGlobales(data || []);
-      }
-    };
-
     fetchServicios();
   }, []);
 
-  return { serviciosGlobales };
+  return {
+    serviciosGlobales,
+    refetchServiciosGlobales: fetchServicios,
+  };
 };

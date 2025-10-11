@@ -15,18 +15,46 @@ const Header = ({ onLogout }) => {
     const location = useLocation();
 
     const getTitulo = () => {
-      if (location.pathname === "/clientes") return "Gestión de Clientes";
-      if (location.pathname === "/horario") return "Horario Semanal";
-      if (location.pathname === "/metricas") return "Estadísticas";
-      return "Bienvenido";
+      if (location.pathname === "/clientes") {
+        return (
+          <div className="flex items-center gap-2">
+            <Icon name="people" className="text-green-500"/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-blue-500 text-lg md:text-2xl font-bold">
+              Gestión de Clientes
+            </span>
+          </div>
+        );
+      }
+      if (location.pathname === "/horario") {
+        return (
+          <div className="flex items-center gap-2">
+            <Icon name="calendarT" className="text-green-500"/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-blue-500 text-lg md:text-2xl font-bold">
+              Horario Semanal
+            </span>
+          </div>
+        );
+      }
+      if (location.pathname === "/metricas") {
+        return (
+          <div className="flex items-center gap-2">
+            <Icon name="statsT" className="text-green-500"/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-blue-500 text-lg md:text-2xl font-bold">
+              Estadísticas
+            </span>
+          </div>
+        );
+      }
+      return (
+        <h1 className="text-2xl font-bold text-gray-800">
+          Bienvenido
+        </h1>
+      );
     };
 
-    return (
-      <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-blue-500 text-2xl font-bold">
-        {getTitulo()}
-      </h1>
-    );
+    return getTitulo();
   };
+
 
   return (
     <>
@@ -53,7 +81,7 @@ const Header = ({ onLogout }) => {
               <NavLink to="/metricas">
                 {({ isActive }) => (
                   <Button className={`cursor-pointer px-6 py-2.5 ${isActive ? activeColorClasses : inactiveColorClasses}`}>
-                    <Icon name="calendar" />Estadísticas
+                    <Icon name="stats" />Estadísticas
                   </Button>
                 )}
               </NavLink>
@@ -99,7 +127,7 @@ const Header = ({ onLogout }) => {
           <NavLink to="/metricas" onClick={() => setMenuOpen(false)}>
             {({ isActive }) => (
               <Button className={`cursor-pointer w-50 px-6 py-2.5 ${isActive ? activeColorClasses : inactiveColorClasses}`}>
-                <Icon name="calendar" />Estadísticas
+                <Icon name="stats" />Estadísticas
               </Button>
             )}
           </NavLink>

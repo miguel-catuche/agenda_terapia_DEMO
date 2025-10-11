@@ -11,7 +11,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getMotivoCitas, estadoLabels, motivoLabels, getEstadoClasses } from "@/helpers/colorHelper";
-import { useClienteServicio } from "@/hooks/useClienteServicio";
 
 const allowedHours = ["07", "08", "09", "10", "14", "15", "16", "17"];
 const allowedMinutes = ["00", "15", "30", "45"];

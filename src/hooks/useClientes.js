@@ -95,13 +95,66 @@ export const useClientes = () => {
   };
 
   const deleteCliente = async (id) => {
-    const { error } = await supabase.from("clientes").delete().eq("id", id);
-    if (error) {
-      console.error("Error al eliminar cliente:", error.message);
+    try {
+      // 1. Obtener IDs de clientes_servicio
+      const { data: serviciosRelacionados, error: errorServiciosIds } =
+        await supabase
+          .from("clientes_servicio")
+          .select("id")
+          .eq("cliente_id", id);
+
+      if (errorServiciosIds) {
+        throw new Error(
+          "Error al obtener servicios relacionados: " +
+            errorServiciosIds.message
+        );
+      }
+
+      const idsRelacionados = serviciosRelacionados?.map((s) => s.id) || [];
+
+      // 2. Eliminar citas asociadas
+      if (idsRelacionados.length > 0) {
+        const { error: errorCitas } = await supabase
+          .from("citas")
+          .delete()
+          .in("clientes_servicio_id", idsRelacionados);
+
+        if (errorCitas) {
+          throw new Error("Error al eliminar citas: " + errorCitas.message);
+        }
+      }
+
+      // 3. Eliminar servicios asociados
+      const { error: errorServicios } = await supabase
+        .from("clientes_servicio")
+        .delete()
+        .eq("cliente_id", id);
+
+      if (errorServicios) {
+        throw new Error(
+          "Error al eliminar servicios: " + errorServicios.message
+        );
+      }
+
+      // 4. Eliminar cliente
+      const { error: errorCliente } = await supabase
+        .from("clientes")
+        .delete()
+        .eq("id", id);
+
+      if (errorCliente) {
+        throw new Error("Error al eliminar cliente: " + errorCliente.message);
+      }
+
+      setClientes((prev) =>
+        Array.isArray(prev) ? prev.filter((c) => c.id !== id) : []
+      );
+      return true;
+    } catch (err) {
+      console.error(err.message);
+      toast.error("No se pudo eliminar el cliente");
       return false;
     }
-    setClientes((prev) => prev.filter((c) => c.id !== id));
-    return true;
   };
 
   useEffect(() => {

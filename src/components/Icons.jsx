@@ -114,7 +114,50 @@ export default function Icon({ name, size = 24, className = "" }) {
         <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
       </svg>
     ),
-
+    stats: (
+      <svg {...commonProps} className={`lucide lucide-file-chart-column-icon ${className}`}>
+        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+        <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+        <path d="M8 18v-1" />
+        <path d="M12 18v-6" />
+        <path d="M16 18v-3" />
+      </svg>
+    ),
+    statsT: (
+      <svg {...commonProps} strokeWidth="2.2" className={`lucide lucide-file-chart-column-icon ${className}`}>
+        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+        <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+        <path d="M8 18v-1" />
+        <path d="M12 18v-6" />
+        <path d="M16 18v-3" />
+      </svg>
+    ),
+    calendarT: (
+      <svg {...commonProps} strokeWidth="2.2" className={`lucide lucide-calendar-icon ${className}`}>
+        <path d="M8 2v4" />
+        <path d="M16 2v4" />
+        <rect width="18" height="18" x="3" y="4" rx="2" />
+        <path d="M3 10h18" />
+      </svg>
+    ),
+    peopleT: (
+      <svg {...commonProps} strokeWidth="2.2" className={`lucide lucide-users-icon ${className}`}>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <path d="M16 3.128a4 4 0 0 1 0 7.744" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+        <circle cx="9" cy="7" r="4" />
+      </svg>
+    ),
+    calendarPlus: (
+      <svg {...commonProps} className={`lucide lucide-calendar-plus-icon ${className}`}>
+        <path d="M16 19h6" />
+        <path d="M16 2v4" />
+        <path d="M19 16v6" />
+        <path d="M21 12.598V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8.5" />
+        <path d="M3 10h18" />
+        <path d="M8 2v4" />
+      </svg>
+    ),
 
   };
 
