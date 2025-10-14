@@ -49,22 +49,27 @@ export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
 
   // Logo
   const logoBase64 =
-    "https://cdn.myanimelist.net/images/characters/7/582489.jpg";
+    "https://i.imgur.com/NQERpK7.png";
   doc.addImage(logoBase64, "JPEG", x + 15, y + 10, 60, 60);
 
   // Centro: nombre empresa y título
   const centroX = x + anchoLogo + anchoCentro / 2;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  doc.text("NOMBRE DE EMPRESA", centroX, y + 25, { align: "center" });
+  // Primera línea
+doc.text("CENTRO TERAPÉUTICO INTEGRAL", centroX, y + 18, { align: "center" });
+
+// Segunda línea
+doc.text("MARÍA DEL PILAR TAMAYO GARCÍA", centroX, y + 32, { align: "center" });
+
 
   // Línea horizontal divisoria
   doc.setDrawColor(0);
   doc.setFillColor(0);
-  doc.rect(x + anchoLogo, y + 35, anchoCentro, 0.3, "F"); // línea horizontal simulada
+  doc.rect(x + anchoLogo, y + 40, anchoCentro, 0.3, "F"); // línea horizontal simulada
 
-  doc.setFontSize(10);
-  doc.text("FORMATO REGISTRO DE ASISTENCIA", centroX, y + 55, {
+  doc.setFontSize(11);
+  doc.text("FORMATO REGISTRO DE ASISTENCIA", centroX, y + 62, {
     align: "center",
   });
 
@@ -153,10 +158,10 @@ export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
   });
 
   //Paginación
-  const firmaY = doc.lastAutoTable.finalY + 30;
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  doc.text("Firma del responsable: ______________________", 40, firmaY);
+  // const firmaY = doc.lastAutoTable.finalY + 30;
+  // doc.setFontSize(10);
+  // doc.setFont("helvetica", "normal");
+  // doc.text("Firma del responsable: ______________________", 40, firmaY);
 
   const pageCount = doc.internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {

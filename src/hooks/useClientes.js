@@ -96,7 +96,6 @@ export const useClientes = () => {
 
   const deleteCliente = async (id) => {
     try {
-      // 1. Obtener IDs de clientes_servicio
       const { data: serviciosRelacionados, error: errorServiciosIds } =
         await supabase
           .from("clientes_servicio")
@@ -112,7 +111,6 @@ export const useClientes = () => {
 
       const idsRelacionados = serviciosRelacionados?.map((s) => s.id) || [];
 
-      // 2. Eliminar citas asociadas
       if (idsRelacionados.length > 0) {
         const { error: errorCitas } = await supabase
           .from("citas")
@@ -124,7 +122,6 @@ export const useClientes = () => {
         }
       }
 
-      // 3. Eliminar servicios asociados
       const { error: errorServicios } = await supabase
         .from("clientes_servicio")
         .delete()
@@ -136,7 +133,6 @@ export const useClientes = () => {
         );
       }
 
-      // 4. Eliminar cliente
       const { error: errorCliente } = await supabase
         .from("clientes")
         .delete()
