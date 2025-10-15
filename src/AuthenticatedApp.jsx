@@ -1,4 +1,3 @@
-// src/AuthenticatedApp.jsx
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Header from "./components/layout/Header";
 import ClientesPage from "./pages/ClientesPage";

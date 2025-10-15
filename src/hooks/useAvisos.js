@@ -57,11 +57,8 @@ const useAvisos = () => {
       .delete()
       .lt("fecha_expiracion", ahora);
 
-    if (error) {
-      console.error("Error al limpiar avisos expirados:", error.message);
-    } else {
-      console.log("✅ Avisos expirados eliminados automáticamente");
-    }
+    if (error) console.error("Error al limpiar avisos expirados:", error.message);
+    
   };
 
   useEffect(() => {
