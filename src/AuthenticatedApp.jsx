@@ -20,7 +20,7 @@ const AuthenticatedApp = ({ onLogout }) => {
   const handleCrearAviso = async (nuevoAviso) => {
     const { error } = await supabase.from("avisos").insert(nuevoAviso);
     if (!error) {
-      recargar(); // ← actualiza los avisos desde la DB
+      recargar();
     } else {
       console.error("Error al guardar aviso:", error.message);
     }

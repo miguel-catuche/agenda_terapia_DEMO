@@ -1,4 +1,3 @@
-// src/hooks/useClienteServicio.js
 import { useEffect, useState } from "react";
 import { supabase } from "@/supabaseClient";
 import { useServicioLabels } from "@/helpers/useServicioLabels";

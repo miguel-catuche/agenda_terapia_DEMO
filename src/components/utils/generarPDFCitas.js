@@ -24,7 +24,6 @@ export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
     minute: "2-digit",
   });
 
-  // Encabezado institucional
   const x = 40;
   const y = 40;
   const anchoTotal = 520;
@@ -33,12 +32,10 @@ export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
   const anchoExpedido = 90;
   const anchoCentro = anchoTotal - anchoLogo - anchoExpedido;
 
-  // Cuadro principal
-  doc.setDrawColor(0); // negro puro
-  doc.setLineWidth(0.5); // grosor institucional
-  doc.rect(x, y, anchoTotal, altoFila, "D"); // D = solo borde
+  doc.setDrawColor(0);
+  doc.setLineWidth(0.5);
+  doc.rect(x, y, anchoTotal, altoFila, "D");
 
-  // Divisiones verticales
   doc.line(x + anchoLogo, y, x + anchoLogo, y + altoFila);
   doc.line(
     x + anchoLogo + anchoCentro,
@@ -48,20 +45,18 @@ export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
   );
 
   // Logo
-  const logoBase64 =
-    "https://i.imgur.com/NQERpK7.png";
+  const logoBase64 = "https://i.imgur.com/NQERpK7.png";
   doc.addImage(logoBase64, "JPEG", x + 15, y + 10, 60, 60);
 
-  // Centro: nombre empresa y título
   const centroX = x + anchoLogo + anchoCentro / 2;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  // Primera línea
-doc.text("CENTRO TERAPÉUTICO INTEGRAL", centroX, y + 18, { align: "center" });
 
-// Segunda línea
-doc.text("MARÍA DEL PILAR TAMAYO GARCÍA", centroX, y + 32, { align: "center" });
+  doc.text("CENTRO TERAPÉUTICO INTEGRAL", centroX, y + 18, { align: "center" });
 
+  doc.text("MARÍA DEL PILAR TAMAYO GARCÍA", centroX, y + 32, {
+    align: "center",
+  });
 
   // Línea horizontal divisoria
   doc.setDrawColor(0);

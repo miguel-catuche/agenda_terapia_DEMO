@@ -52,8 +52,8 @@ const App = () => {
         position="top-center"
         toastOptions={{
           style: {
-            fontSize: "1.2rem",   // 🔥 texto más grande
-            padding: "16px 20px", // más espacio interno
+            fontSize: "1.2rem",
+            padding: "16px 20px",
             borderRadius: "10px",
           },
           success: {
@@ -63,7 +63,7 @@ const App = () => {
             style: { background: "#fee2e2", color: "#991b1b" }, // rojo error
           },
         }}
-        containerStyle={{ zIndex: 9999 }} // asegura que quede encima de modales
+        containerStyle={{ zIndex: 9999 }}
       />
       {user ? (
         <AuthenticatedApp

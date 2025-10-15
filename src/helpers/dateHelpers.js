@@ -1,4 +1,3 @@
-// src/utils/dateHelpers.js
 export const getDateForDay = (date, day) => {
   const daysNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
   const idx = daysNames.indexOf(day);

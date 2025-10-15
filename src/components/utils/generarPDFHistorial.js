@@ -7,6 +7,8 @@ const servicioLabels = {
   drenaje_linfatico: "DRENAJE LINFÁTICO",
   piso_pelvico: "PISO PÉLVICO",
   terapia_respiratoria: "TERAPIA RESPIRATORIA",
+  terapia_vestibular: "TERAPIA VESTIBULAR",
+  acondicionamiento_fisico: "ACONDICIONAMIENTO FÍSICO",
 };
 
 export const generarPDFHistorial = (cliente, citas) => {
@@ -22,7 +24,6 @@ export const generarPDFHistorial = (cliente, citas) => {
     minute: "2-digit",
   });
 
-  // Encabezado institucional
   const x = 40;
   const y = 40;
   const anchoTotal = 520;
@@ -31,12 +32,10 @@ export const generarPDFHistorial = (cliente, citas) => {
   const anchoExpedido = 90;
   const anchoCentro = anchoTotal - anchoLogo - anchoExpedido;
 
-  // Cuadro principal
-  doc.setDrawColor(0); // negro puro
-  doc.setLineWidth(0.5); // grosor institucional
-  doc.rect(x, y, anchoTotal, altoFila, "D"); // D = solo borde
+  doc.setDrawColor(0);
+  doc.setLineWidth(0.5);
+  doc.rect(x, y, anchoTotal, altoFila, "D");
 
-  // Divisiones verticales
   doc.line(x + anchoLogo, y, x + anchoLogo, y + altoFila);
   doc.line(
     x + anchoLogo + anchoCentro,
@@ -49,7 +48,6 @@ export const generarPDFHistorial = (cliente, citas) => {
   const logoBase64 = "https://i.imgur.com/NQERpK7.png";
   doc.addImage(logoBase64, "JPEG", x + 15, y + 10, 60, 60);
 
-  // Centro: nombre empresa y título
   const centroX = x + anchoLogo + anchoCentro / 2;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
@@ -79,19 +77,16 @@ export const generarPDFHistorial = (cliente, citas) => {
   doc.text(`Fecha: ${fechaActual}`, expX, y + 35);
   doc.text(`Hora: ${horaActual}`, expX, y + 50);
 
-  // Sección 1: Registro de Asistencia
   const seccion1Y = 150;
   const altoSeccion = 20;
 
   doc.setFontSize(11);
   doc.setFont("helvetica", "bold");
 
-  // Dibujar rectángulo con borde y fondo
-  doc.setDrawColor(0); // borde negro
-  doc.setFillColor(255, 243, 168); // fondo amarillo institucional
-  doc.rect(40, seccion1Y, 520, altoSeccion, "FD"); // F = fill, D = draw (borde + fondo)
+  doc.setDrawColor(0);
+  doc.setFillColor(168, 213, 255);
+  doc.rect(40, seccion1Y, 520, altoSeccion, "FD");
 
-  // Centrar el texto dentro del rectángulo
   doc.text("1. REGISTRO DE ASISTENCIA", 300, seccion1Y + 14, {
     align: "center",
   });
@@ -101,13 +96,15 @@ export const generarPDFHistorial = (cliente, citas) => {
     servicioLabels[cliente?.motivo?.toLowerCase()] ||
     "—";
 
-  // Tabla pegada al título, sin espacio
   doc.autoTable({
     startY: seccion1Y + altoSeccion,
     theme: "grid",
     head: null,
     body: [
-      [`EMPRESA: CENTRO TERAPÉUTICO INTEGRAL MARÍA DEL PILAR TAMAYO GARCÍA`, `SERVICIO: ${motivo}`],
+      [
+        `EMPRESA: CENTRO TERAPÉUTICO INTEGRAL MARÍA DEL PILAR TAMAYO GARCÍA`,
+        `SERVICIO: ${motivo}`,
+      ],
       [
         `PACIENTE: ${cliente?.nombre || "—"}`,
         `Documento de identidad: ${cliente?.id || "—"}`,
@@ -129,24 +126,20 @@ export const generarPDFHistorial = (cliente, citas) => {
     tableWidth: 520,
   });
 
-  // Línea inferior del título
   doc.setDrawColor(0);
   doc.setLineWidth(0.5);
   doc.line(40, seccion1Y + altoSeccion, 560, seccion1Y + altoSeccion);
 
-  // Sección 2: Seguimiento
   const seguimientoY = doc.lastAutoTable.finalY + 30;
 
   doc.setFontSize(11);
   doc.setFont("helvetica", "bold");
 
-  // Título con fondo y borde institucional
-  doc.setDrawColor(0); // borde negro
-  doc.setFillColor(255, 243, 168); // fondo amarillo
-  doc.rect(40, seguimientoY, 520, 20, "FD"); // F = fill, D = draw
+  doc.setDrawColor(0);
+  doc.setFillColor(168, 213, 255);
+  doc.rect(40, seguimientoY, 520, 20, "FD");
   doc.text("2. SEGUIMIENTO", 300, seguimientoY + 14, { align: "center" });
 
-  // Preparar filas
   const estadoLabels = {
     programada: "Programada",
     completada: "Completada",
@@ -164,13 +157,12 @@ export const generarPDFHistorial = (cliente, citas) => {
     ];
   });
 
-  // Dibujar tabla institucional con bordes definidos
   doc.autoTable({
     startY: seguimientoY + 20,
     head: [["FECHA", "HORA", "ESTADO"]],
     body: seguimientoRows,
     theme: "grid",
-    showHead: "everyPage", // 👈 esto mantiene el encabezado en todas las páginas
+    showHead: "everyPage",
     styles: {
       fontSize: 10,
       halign: "center",
@@ -228,8 +220,8 @@ export const generarPDFHistorial = (cliente, citas) => {
     }
   }
 
-  const nombreArchivo = `registro_historico_${
-    cliente?.nombre?.replace(/\s+/g, "_") || "paciente"
-  }.pdf`;
+  const nombreArchivo = `${
+  cliente?.nombre?.toUpperCase().replace(/\s+/g, "_") || "PACIENTE"
+}_registro_historico_${motivo.toLowerCase()}.pdf`;
   doc.save(nombreArchivo);
 };

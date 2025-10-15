@@ -8,6 +8,7 @@ import ExportadorMensual from "@/components/ExportadorMensual";
 const Metricas = () => {
     const { clientes } = useClientes();
     const hoy = new Date();
+    const añoActual = hoy.getFullYear();
 
     const getSemanaRange = (baseDate) => {
         const base = new Date(baseDate);
@@ -36,6 +37,7 @@ const Metricas = () => {
     const { citas: citasSemana } = useCitas(startDateStr, endDateStr);
     const { citas: citasMes } = useCitas(mesInicio, mesFin);
     const { citas: citasHoy } = useCitas(hoyStr, hoyStr);
+    const { citas: citasAnuales } = useCitas(`${añoActual}-01-01`, `${añoActual}-12-31`);
 
     const normalizar = (estado) => estado?.toLowerCase().replace(/\s/g, "-");
 
@@ -155,7 +157,7 @@ const Metricas = () => {
             </div>
 
             <div className="mt-6">
-                <ExportadorMensual citas={citasMes} clientes={clientes} />
+                <ExportadorMensual citas={citasAnuales} clientes={clientes} />
             </div>
         </div>
     );

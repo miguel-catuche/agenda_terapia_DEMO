@@ -454,7 +454,6 @@ export default function HorarioMedico() {
         <GeneradorSeguimiento citas={citas} />
       </div>     
       
-      {/* Componente externo con los modales de gestión de citas */}
       <CitasModal
         selectedDay={selectedDay}
         selectedCell={selectedCell}

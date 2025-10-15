@@ -1,4 +1,3 @@
-// src/hooks/useClientesServicioGlobal.js
 import { useEffect, useState } from "react";
 import { supabase } from "@/supabaseClient";
 

@@ -1,4 +1,3 @@
-// src/components/CitasModal.jsx
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,7 +32,6 @@ const CitasModal = ({
   handleDelete,
   setSelectedCell,
 }) => {
-  // SVG del ícono de ojo
   const EyeIcon = () => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -213,7 +211,7 @@ const CitasModal = ({
         </div>
       )}
 
-      {/* Modal para EDITAR, ELIMINAR y VER citas (con campos de documento y nombre deshabilitados) */}
+      {/* Modal para EDITAR, ELIMINAR y VER citas*/}
       {showEditModal && selectedAppointment && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={() => {

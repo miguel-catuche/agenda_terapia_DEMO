@@ -47,7 +47,7 @@ const ClientesPage = () => {
     const [modoHistorial, setModoHistorial] = useState("resumen");
     const [servicioPendienteEliminar, setServicioPendienteEliminar] = useState(null);
     const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
-    const {serviciosGlobales, refetchServiciosGlobales } = useClientesServicioGlobal();
+    const { serviciosGlobales, refetchServiciosGlobales } = useClientesServicioGlobal();
 
     const {
         showForm: showCitaModal,
@@ -160,7 +160,7 @@ const ClientesPage = () => {
                     const [hour, minute] = cita.hora.split(":");
                     return new Date(year, month - 1, day, hour, minute).getTime();
                 };
-                return getTimestamp(b) - getTimestamp(a); // más recientes primero
+                return getTimestamp(b) - getTimestamp(a);
             })
         : [];
 
@@ -168,8 +168,8 @@ const ClientesPage = () => {
     useEffect(() => {
         if (clientes.length > 0) {
             const seleccion = [...clientes]
-                .sort(() => Math.random() - 0.5) // mezcla el array
-                .slice(0, 15); // toma solo 10
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 15);
             setClientesAleatorios(seleccion);
         }
     }, [clientes]);
@@ -192,6 +192,8 @@ const ClientesPage = () => {
             { value: "drenaje_linfatico", label: "Drenaje Linfático" },
             { value: "piso_pelvico", label: "Piso Pélvico" },
             { value: "terapia_respiratoria", label: "Terapia Respiratoria" },
+            { value: "terapia_vestibular", label: "Terapia Vestibular" },
+            { value: "acondicionamiento_fisico", label: "Acondicionamiento Físico" },
         ],
     };
 
