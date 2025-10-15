@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { supabase } from "@/supabaseClient";
-import { generarPDFCitas } from "./utils/generarPDFCitas";
+import { generarPDFCitas } from "../pdf/generarPDFCitas";
 import toast from "react-hot-toast";
 
 const GeneradorSeguimiento = ({ citas }) => {

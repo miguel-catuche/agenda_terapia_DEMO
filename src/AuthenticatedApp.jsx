@@ -1,12 +1,12 @@
 // src/AuthenticatedApp.jsx
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import Header from "./components/Header";
+import Header from "./components/layout/Header";
 import ClientesPage from "./pages/ClientesPage";
 import HorarioMedico from "./pages/HorarioTerapia";
 import Metricas from "./pages/Metricas";
 import { AnimatePresence } from "framer-motion";
-import AnimatedPage from "./components/AnimatedPage";
-import Panel from "./components/Panel";
+import AnimatedPage from "./components/layout/AnimatedPage";
+import Panel from "./components/domain/Panel";
 import useAvisos from "./hooks/useAvisos";
 import { useState} from "react";
 import { supabase } from "./supabaseClient";

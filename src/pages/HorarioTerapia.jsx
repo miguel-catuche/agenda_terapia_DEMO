@@ -1,17 +1,17 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import CitasModal from "../components/CitasModal";
+import CitasModal from "../components/domain/CitasModal";
 import toast from 'react-hot-toast';
-import Icon from "@/components/Icons";
+import Icon from "@/components/shared/Icons";
 import { useCitas } from "@/hooks/useCitas";
 import { useClientes } from "@/hooks/useClientes";
 import { getDateForDay } from "@/helpers/dateHelpers";
 import { useClienteServicio } from "@/hooks/useClienteServicio";
 import { useServicioLabels } from "@/helpers/useServicioLabels";
 import { useClientesServicioGlobal } from "@/hooks/useClientesServicioGlobal";
-import GeneradorSeguimiento from "@/components/GeneradorSeguimient";
-import ModalCrearCita from "@/components/ModalCrearCita";
+import GeneradorSeguimiento from "@/components/domain/GeneradorSeguimiento";
+import ModalCrearCita from "@/components/domain/ModalCrearCita";
 
 const hours = [
   "07:00:00",

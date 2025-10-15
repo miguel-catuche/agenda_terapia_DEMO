@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { NavLink, useNavigate } from "react-router-dom";
-import Icon from "./Icons";
+import Icon from "../shared/Icons";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 const Header = ({ onLogout }) => {

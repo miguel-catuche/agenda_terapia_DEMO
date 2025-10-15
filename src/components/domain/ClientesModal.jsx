@@ -1,9 +1,9 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Icon from "@/components/Icons";
+import Icon from "@/components/shared/Icons";
 import { Card, CardContent } from "@/components/ui/card";
-import { generarPDFHistorial } from "@/components/utils/generarPDFHistorial";
+import { generarPDFHistorial } from "../pdf/generarPDFHistorial";
 import { estadoLabels, getEstadoColor } from "@/helpers/colorHelper";
 
 export default function ClientesModal({

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "../supabaseClient";
-import Icon from "@/components/Icons";
+import { supabase } from "@/supabaseClient";
+import Icon from "@/components/shared/Icons";
 import { toast } from "react-hot-toast";
 
 const ModalAvisos = ({ visible, onClose, avisos = [], recargar, eliminarAviso }) => {

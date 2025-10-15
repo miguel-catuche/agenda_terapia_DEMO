@@ -1,9 +1,9 @@
 import React from "react";
-import DonutCard from "@/components/DonutCard";
-import Icon from "@/components/Icons";
+import DonutCard from "@/components/domain/DonutCard";
+import Icon from "@/components/shared/Icons";
 import { useClientes } from "@/hooks/useClientes";
 import { useCitas } from "@/hooks/useCitas";
-import ExportadorMensual from "@/components/ExportadorMensual";
+import ExportadorMensual from "@/components/domain/ExportadorMensual";
 
 const Metricas = () => {
     const { clientes } = useClientes();

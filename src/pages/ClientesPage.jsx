@@ -6,13 +6,13 @@ import { useCitas } from '@/hooks/useCitas';
 import { useMemo } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useClientes } from '@/hooks/useClientes';
-import Icon from '@/components/Icons';
+import Icon from '@/components/shared/Icons';
 import toast from 'react-hot-toast';
 import { useClienteServicio } from '@/hooks/useClienteServicio';
 import { useServicioLabels } from '@/helpers/useServicioLabels';
 import { estadoLabels, getEstadoColor, getMotivoColor, motivoLabels } from '@/helpers/colorHelper';
-import ClientesModal from '@/components/ClientesModal';
-import ModalNuevaCita from '@/components/ModalNuevaCita';
+import ClientesModal from '@/components/domain/ClientesModal';
+import ModalNuevaCita from '@/components/domain/ModalNuevaCita';
 import { useAgendarCita } from '@/hooks/useAgendarCita';
 import { useClientesServicioGlobal } from '@/hooks/useClientesServicioGlobal';
 

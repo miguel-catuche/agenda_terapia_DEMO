@@ -1,7 +1,7 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Icon from "@/components/Icons";
+import Icon from "@/components/shared/Icons";
 
 export default function ModalNuevaCita({
   showForm,

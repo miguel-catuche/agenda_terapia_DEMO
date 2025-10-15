@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import useAvisos from "@/hooks/useAvisos";
 import ModalAvisos from "./ModalAvisos";
-import BotonAvisos from "./BotonAvisos";
+import BotonAvisos from "../shared/BotonAvisos";
 
 const Panel = () => {
   const { avisos, recargar, eliminarAviso } = useAvisos();
