@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
   const { titulo = "SEGUIMIENTO DE CITAS", nombreArchivo = "seguimiento.pdf" } =
@@ -60,7 +60,7 @@ export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
 
   // Línea horizontal divisoria
   doc.setDrawColor(0);
-  doc.setFillColor(0);
+  doc.setFillColor("0");
   doc.rect(x + anchoLogo, y + 40, anchoCentro, 0.3, "F"); // línea horizontal simulada
 
   doc.setFontSize(11);
@@ -106,7 +106,7 @@ export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
     align: "center",
   });
 
-  doc.autoTable({
+  autoTable(doc, {
     startY: seguimientoY + 20,
     head: [["DOCUMENTO", "NOMBRE", "FECHA", "HORA", "ESTADO"]],
     body: seguimientoRows,
@@ -134,7 +134,7 @@ export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
     },
     tableWidth: 520,
     didDrawPage: (data) => {
-      const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
+      const currentPage = doc.getCurrentPageInfo().pageNumber; // ← corregido
       if (currentPage > 1) {
         data.settings.margin.top = 100;
         doc.setFontSize(11);
@@ -142,10 +142,6 @@ export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
         doc.setDrawColor(0);
         doc.setFillColor(255, 243, 168);
         const offsetY = y - 20;
-        doc.setFontSize(11);
-        doc.setFont("helvetica", "bold");
-        doc.setDrawColor(0);
-        doc.setFillColor(255, 243, 168);
         doc.rect(40, offsetY, 520, 20, "FD");
         doc.text(`${titulo}`, 300, offsetY + 14, { align: "center" });
       }
@@ -158,7 +154,7 @@ export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
   // doc.setFont("helvetica", "normal");
   // doc.text("Firma del responsable: ______________________", 40, firmaY);
 
-  const pageCount = doc.internal.getNumberOfPages();
+  const pageCount = doc.getNumberOfPages(); // ← corregido
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(8);

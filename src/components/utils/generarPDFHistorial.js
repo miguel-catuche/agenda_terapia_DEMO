@@ -1,5 +1,5 @@
-import jsPDF from "jspdf";
-import "jspdf-autotable";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const servicioLabels = {
   valoracion: "VALORACIÓN",
@@ -61,7 +61,7 @@ export const generarPDFHistorial = (cliente, citas) => {
 
   // Línea horizontal divisoria
   doc.setDrawColor(0);
-  doc.setFillColor(0);
+  doc.setFillColor("0");
   doc.rect(x + anchoLogo, y + 40, anchoCentro, 0.3, "F"); // línea horizontal simulada
 
   doc.setFontSize(11);
@@ -96,7 +96,7 @@ export const generarPDFHistorial = (cliente, citas) => {
     servicioLabels[cliente?.motivo?.toLowerCase()] ||
     "—";
 
-  doc.autoTable({
+  autoTable(doc, {
     startY: seccion1Y + altoSeccion,
     theme: "grid",
     head: null,
@@ -110,13 +110,12 @@ export const generarPDFHistorial = (cliente, citas) => {
         `Documento de identidad: ${cliente?.id || "—"}`,
       ],
     ],
-
     styles: {
       fontSize: 10,
       halign: "left",
       cellPadding: 6,
-      lineWidth: 0.5, // ← bordes más definidos
-      lineColor: [0, 0, 0], // ← negro puro
+      lineWidth: 0.5,
+      lineColor: [0, 0, 0],
       textColor: [0, 0, 0],
     },
     columnStyles: {
@@ -130,6 +129,7 @@ export const generarPDFHistorial = (cliente, citas) => {
   doc.setLineWidth(0.5);
   doc.line(40, seccion1Y + altoSeccion, 560, seccion1Y + altoSeccion);
 
+  // @ts-ignore
   const seguimientoY = doc.lastAutoTable.finalY + 30;
 
   doc.setFontSize(11);
@@ -157,7 +157,7 @@ export const generarPDFHistorial = (cliente, citas) => {
     ];
   });
 
-  doc.autoTable({
+  autoTable(doc, {
     startY: seguimientoY + 20,
     head: [["FECHA", "HORA", "ESTADO"]],
     body: seguimientoRows,
@@ -184,6 +184,7 @@ export const generarPDFHistorial = (cliente, citas) => {
     },
     tableWidth: 520,
     didDrawPage: (data) => {
+      // @ts-ignore
       const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
 
       if (currentPage > 1) {
@@ -198,6 +199,7 @@ export const generarPDFHistorial = (cliente, citas) => {
     },
   });
 
+  // @ts-ignore
   const pageCount = doc.internal.getNumberOfPages();
 
   for (let i = 1; i <= pageCount; i++) {
@@ -211,6 +213,7 @@ export const generarPDFHistorial = (cliente, citas) => {
     // doc.text("Firma del responsable: ______________________", 40, firmaY);
 
     // Número de página
+    // @ts-ignore
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
@@ -221,7 +224,7 @@ export const generarPDFHistorial = (cliente, citas) => {
   }
 
   const nombreArchivo = `${
-  cliente?.nombre?.toUpperCase().replace(/\s+/g, "_") || "PACIENTE"
-}_registro_historico_${motivo.toLowerCase()}.pdf`;
+    cliente?.nombre?.toUpperCase().replace(/\s+/g, "_") || "PACIENTE"
+  }_registro_historico_${motivo.toLowerCase()}.pdf`;
   doc.save(nombreArchivo);
 };

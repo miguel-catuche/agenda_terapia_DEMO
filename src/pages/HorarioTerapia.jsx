@@ -1,4 +1,3 @@
-// src/components/HorarioTerapia.jsx
 import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
