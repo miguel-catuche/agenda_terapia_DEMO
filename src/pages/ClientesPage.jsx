@@ -270,7 +270,7 @@ const ClientesPage = () => {
                             <Icon name="search" className="text-gray-400 mr-2" />
                             <input
                                 type="text"
-                                placeholder="Buscar por nombre o documento..."
+                                placeholder="Buscar cliente..."
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 className="w-full outline-none text-sm text-gray-700 placeholder-gray-400"
