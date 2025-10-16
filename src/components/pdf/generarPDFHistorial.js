@@ -192,7 +192,7 @@ export const generarPDFHistorial = (cliente, citas) => {
         doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
         doc.setDrawColor(0);
-        doc.setFillColor(255, 243, 168);
+        doc.setFillColor(168, 213, 255);
         doc.rect(40, y, 520, 20, "FD");
         doc.text("2. SEGUIMIENTO", 300, y + 14, { align: "center" });
       }

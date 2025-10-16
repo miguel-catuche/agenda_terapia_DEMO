@@ -112,6 +112,8 @@ export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
     body: seguimientoRows,
     theme: "grid",
     showHead: "everyPage",
+    // margin: { top: 100 }, ← quítalo
+
     styles: {
       fontSize: 10,
       halign: "center",
@@ -133,15 +135,15 @@ export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
       4: { cellWidth: 100 },
     },
     tableWidth: 520,
+
     didDrawPage: (data) => {
-      const currentPage = doc.getCurrentPageInfo().pageNumber; // ← corregido
-      if (currentPage > 1) {
-        data.settings.margin.top = 100;
+      const pageNumber = doc.getCurrentPageInfo().pageNumber;
+      if (pageNumber > 1) {
+        const offsetY = 40; // posición fija para encabezado visual
         doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
         doc.setDrawColor(0);
         doc.setFillColor(255, 243, 168);
-        const offsetY = y - 20;
         doc.rect(40, offsetY, 520, 20, "FD");
         doc.text(`${titulo}`, 300, offsetY + 14, { align: "center" });
       }
