@@ -292,7 +292,7 @@ export default function ClientesModal({
                                         return (
                                             <Card key={index} className="p-4 bg-gray-50">
                                                 <CardContent className="p-0">
-                                                    <div className="flex justify-between items-center">
+                                                    <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
                                                         <div className="text-sm text-gray-700">
                                                             <p><strong>Servicio:</strong> {servicioLabels[servicio] || servicio}</p>
                                                             <p><strong>Sesiones:</strong> {sesiones}</p>
