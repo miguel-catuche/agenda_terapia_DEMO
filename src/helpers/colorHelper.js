@@ -1,8 +1,7 @@
 export const estadoLabels = {
   programada: "Programada",
-  completada: "Completada",
-  cancelada: "Cancelada",
-  "no-se-presento": "No se presentó",
+  aistio: "Asistió",
+  "no-asitio": "No Asistió",
 };
 
 export const motivoLabels = {
@@ -12,14 +11,12 @@ export const motivoLabels = {
 
 export const getEstadoColor = (estado) => {
   switch (estado) {
-    case "cancelada":
+    case "no-asistio":
       return "bg-red-400";
-    case "no-se-presento":
-      return "bg-orange-400";
+    case "asistio":
+      return "bg-green-400";
     case "programada":
       return "bg-blue-400";
-    case "completada":
-      return "bg-green-400";
     default:
       return "bg-gray-200";
   }
@@ -49,15 +46,13 @@ export const getMotivoCitas = (motivo) => {
 
 export const getEstadoClasses = (estado) => {
   switch (estado) {
-    case 'cancelada':
+    case "no-asistio":
       return 'bg-red-200 border border-red-300 text-red-900 font-semibold';
-    case 'no-se-presento':
-      return 'bg-orange-200 border border-orange-300 text-orange-900 font-semibold';
-    case 'programada':
-      return 'bg-blue-200 border border-blue-300 text-blue-800 font-semibold';
-    case 'completada':
+    case "asistio":
       return 'bg-green-200 border border-green-300 text-green-900 font-semibold';
+    case "programada":
+      return 'bg-blue-200 border border-blue-300 text-blue-800 font-semibold';
     default:
-      return 'bg-gray-200';
+      return "bg-gray-200";
   }
 };

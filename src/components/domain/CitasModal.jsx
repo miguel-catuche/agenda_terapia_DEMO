@@ -306,9 +306,8 @@ const CitasModal = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="programada">Programada</SelectItem>
-                    <SelectItem value="completada">Completada</SelectItem>
-                    <SelectItem value="no-se-presento">No se presentó</SelectItem>
-                    <SelectItem value="cancelada">Cancelada</SelectItem>
+                    <SelectItem value="asistio">Asistió</SelectItem>
+                    <SelectItem value="no-asistio">No Asistó</SelectItem>
                   </SelectContent>
 
                 </Select>
