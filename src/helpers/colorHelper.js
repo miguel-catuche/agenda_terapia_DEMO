@@ -1,7 +1,7 @@
 export const estadoLabels = {
   programada: "Programada",
-  aistio: "Asistió",
-  "no-asitio": "No Asistió",
+  asistio: "Asistió",
+  "no-asistio": "No Asistió",
 };
 
 export const motivoLabels = {

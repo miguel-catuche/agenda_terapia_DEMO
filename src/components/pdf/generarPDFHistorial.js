@@ -142,9 +142,8 @@ export const generarPDFHistorial = (cliente, citas) => {
 
   const estadoLabels = {
     programada: "Programada",
-    completada: "Completada",
-    cancelada: "Cancelada",
-    "no-se-presento": "No Asistió",
+    asistio: "Asistió",
+    "no-asistio": "No Asistió",
   };
 
   const seguimientoRows = citas.map((cita) => {

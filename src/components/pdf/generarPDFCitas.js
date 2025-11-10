@@ -7,9 +7,8 @@ export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
 
   const estadoLabels = {
     programada: "Programada",
-    completada: "Completada",
-    cancelada: "Cancelada",
-    "no-se-presento": "No Asistió",
+    asistio: "Asistió",
+    "no-asistio": "No Asistió",
   };
 
   const doc = new jsPDF({
