@@ -43,15 +43,13 @@ const Metricas = () => {
 
     const agendadasSemana = citasSemana.length;
     const programadaSemana = citasSemana.filter(c => normalizar(c.estado) === "programada").length;
-    const completadasSemana = citasSemana.filter(c => normalizar(c.estado) === "completada").length;
-    const canceladasSemana = citasSemana.filter(c => normalizar(c.estado) === "cancelada").length;
-    const noPresentadoSemana = citasSemana.filter(c => normalizar(c.estado) === "no-se-presento").length;
+    const asistioSemana = citasSemana.filter(c => normalizar(c.estado) === "asistio").length;
+    const noAsistioSemana = citasSemana.filter(c => normalizar(c.estado) === "no-asistio").length;
 
     const agendadasMes = citasMes.length;
     const programadaMes = citasMes.filter(c => normalizar(c.estado) === "programada").length;
-    const completadasMes = citasMes.filter(c => normalizar(c.estado) === "completada").length;
-    const canceladasMes = citasMes.filter(c => normalizar(c.estado) === "cancelada").length;
-    const noPresentadoMes = citasMes.filter(c => normalizar(c.estado) === "no-se-presento").length;
+    const asistioMes = citasMes.filter(c => normalizar(c.estado) === "asistio").length;
+    const noAsistioMes = citasMes.filter(c => normalizar(c.estado) === "no-asistio").length;
 
     const nuevosSemana = clientes.filter(c => {
         if (!c.created_at) return false;
@@ -115,9 +113,8 @@ const Metricas = () => {
                             total={agendadasSemana}
                             data={[
                                 { label: "Programadas", value: programadaSemana },
-                                { label: "Completadas", value: completadasSemana },
-                                { label: "Canceladas", value: canceladasSemana },
-                                { label: "No asistieron", value: noPresentadoSemana },
+                                { label: "Asistieron", value: asistioSemana },
+                                { label: "No asistieron", value: noAsistioSemana },
                             ]}
                         />
                         <DonutCard
@@ -139,9 +136,8 @@ const Metricas = () => {
                             total={agendadasMes}
                             data={[
                                 { label: "Programadas", value: programadaMes },
-                                { label: "Completadas", value: completadasMes },
-                                { label: "Canceladas", value: canceladasMes },
-                                { label: "No asistieron", value: noPresentadoMes },
+                                { label: "Asistieron", value: asistioMes },
+                                { label: "No asistieron", value: noAsistioMes },
                             ]}
                         />
                         <DonutCard

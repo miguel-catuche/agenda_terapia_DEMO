@@ -5,8 +5,6 @@ const DonutCard = ({ titulo, total, data }) => {
         { stroke: "stroke-blue-500", bg: "bg-blue-500" },
         { stroke: "stroke-green-500", bg: "bg-green-500" },
         { stroke: "stroke-red-500", bg: "bg-red-500" },
-        { stroke: "stroke-orange-500", bg: "bg-orange-500" },
-        { stroke: "stroke-purple-500", bg: "bg-purple-500" },
     ];
 
     const totalSum = data.reduce((acc, item) => acc + item.value, 0);
