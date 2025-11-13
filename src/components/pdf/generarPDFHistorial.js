@@ -45,7 +45,7 @@ export const generarPDFHistorial = (cliente, citas) => {
   );
 
   // Logo
-  const logoBase64 = "https://i.imgur.com/NQERpK7.png";
+  const logoBase64 = "https://res.cloudinary.com/dkmlivs50/image/upload/v1761869052/favlogo_qsd9mz.png";
   doc.addImage(logoBase64, "JPEG", x + 15, y + 10, 60, 60);
 
   const centroX = x + anchoLogo + anchoCentro / 2;

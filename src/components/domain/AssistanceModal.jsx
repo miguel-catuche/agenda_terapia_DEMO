@@ -74,10 +74,10 @@ const HourCitasModal = ({ show, onClose, citasHora, onEstadoChange, onGuardar })
         </table>
 
         <div className="flex justify-end gap-3 mt-5">
-          <Button variant="secondary" onClick={onClose}>
+          <Button className={"cursor-pointer bg-gray-200 hover:bg-bg-gray-200"} variant="secondary" onClick={onClose}>
             Cancelar
           </Button>
-          <Button onClick={onGuardar}>Guardar</Button>
+          <Button className={"cursor-pointer bg-green-600 hover:bg-bg-green-600"} onClick={onGuardar}>Guardar</Button>
         </div>
       </div>
     </div>
@@ -195,23 +195,31 @@ const AssistanceModal = ({
       >
         {/* ===== HEADER ===== */}
         <div className="flex justify-between items-center mb-6">
+          {/* Grupo de navegación (fijo) */}
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => handleDayChange(-1)}>
+            <Button className={"cursor-pointer"} variant="ghost" size="icon" onClick={() => handleDayChange(-1)}>
               <ChevronLeft className="w-5 h-5" />
             </Button>
-            <h2 className="font-semibold text-lg text-gray-800 capitalize">
+
+            {/* Título con ancho fijo para evitar que se mueva */}
+            <h2
+              className="font-semibold text-lg text-gray-800 capitalize text-center"
+              style={{ width: "260px" }} // 👈 ancho fijo
+            >
               {formattedHeader}
             </h2>
-            <Button variant="ghost" size="icon" onClick={() => handleDayChange(1)}>
+
+            <Button className={"cursor-pointer"} variant="ghost" size="icon" onClick={() => handleDayChange(1)}>
               <ChevronRight className="w-5 h-5" />
             </Button>
           </div>
 
-          {/* 🔹 Botón Descargar */}
-          <Button variant="outline" size="sm" onClick={handleDescargarPDF}>
+          {/* Botón Descargar (fijo) */}
+          <Button className={"cursor-pointer bg-gray-100 hover:bg-bg-gray-200"} variant="outline" size="sm" onClick={handleDescargarPDF}>
             <Download className="w-4 h-4 mr-1" /> Descargar
           </Button>
         </div>
+
 
         {/* ===== HORAS ===== */}
         <div className="grid grid-cols-8 gap-3 text-center">
@@ -222,11 +230,10 @@ const AssistanceModal = ({
               <div key={hora} className="flex flex-col items-center">
                 <div className="font-medium text-gray-700">{hora}</div>
                 <div
-                  className={`mt-2 px-3 py-2 w-full border rounded-lg cursor-pointer transition text-sm ${
-                    count === 0
+                  className={`mt-2 px-3 py-2 w-full border rounded-lg cursor-pointer transition text-sm ${count === 0
                       ? "bg-gray-100 text-gray-500"
                       : "bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium"
-                  }`}
+                    }`}
                   onClick={() =>
                     count > 0 && (setSelectedHour(hora), setShowHourModal(true))
                   }
@@ -239,7 +246,7 @@ const AssistanceModal = ({
         </div>
 
         <div className="flex justify-end mt-6">
-          <Button variant="secondary" onClick={() => setShowAssistanceModal(false)}>
+          <Button className={"cursor-pointer bg-red-600 hover:bg-bg-red-600 text-white"} variant="secondary" onClick={() => setShowAssistanceModal(false)}>
             Cerrar
           </Button>
         </div>
