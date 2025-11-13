@@ -81,8 +81,8 @@ export const generarPDFCitas = (citas = [], modo = "semana", opciones = {}) => {
 
   const seguimientoRows = citas.map((cita) => {
     const cliente = cita.clientes_servicio?.cliente;
-    const nombre = cliente?.nombre || "—";
-    const documento = cliente?.id || "—";
+    const nombre = cliente?.nombre || cita.clientes_servicio?.cliente_nombre || "—";
+    const documento = cliente?.id || cita.clientes_servicio?.cliente_id || "—";
 
     const [hora, minutos] = cita.hora.split(":");
     const periodo = parseInt(hora, 10) >= 12 ? "p.m" : "a.m";

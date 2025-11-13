@@ -84,6 +84,7 @@ export default function HorarioMedico() {
   const [showModal, setShowModal] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAssistanceModal, setShowAssistanceModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -330,7 +331,7 @@ export default function HorarioMedico() {
               ← Semana anterior
             </Button>
           </div>
-          <div className="md:flex md:justify-center">
+          <div className="md:flex md:justify-center md:gap-2">
             <Button
               className="w-full md:w-40 cursor-pointer bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all"
               onClick={() => setMode(mode === "view" ? "edit" : "view")}
@@ -346,6 +347,15 @@ export default function HorarioMedico() {
                   Ver Agenda
                 </>
               )}
+            </Button>
+            <Button
+              className="w-full md:w-40 cursor-pointer bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all"
+              onClick={() => {
+                setShowAssistanceModal(true)
+              }}
+            >
+              <Icon name="check" />
+              Tomar Asistencia
             </Button>
           </div>
           <div className="md:flex md:justify-end">
@@ -399,7 +409,7 @@ export default function HorarioMedico() {
             {hours.map((hour) => (
               <React.Fragment key={hour}>
                 {/* Columna de hora sticky */}
-                <div className="border-b border-white font-bold text-white flex items-center justify-center bg-gradient-to-r from-blue-500 to-teal-500 text-white border-r border-gray-200 sticky left-0 z-10">
+                <div className="border-b font-bold text-white flex items-center justify-center bg-gradient-to-r from-blue-500 to-teal-500 border-r border-gray-200 sticky left-0 z-10">
                   {hour.slice(0, 5)}
                 </div>
 
@@ -451,12 +461,13 @@ export default function HorarioMedico() {
       </div>
       <div className="mt-6">
         <GeneradorSeguimiento citas={citas} />
-      </div>     
-      
+      </div>
+
       <CitasModal
         selectedDay={selectedDay}
         selectedCell={selectedCell}
         selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
         showModal={showModal}
         setShowModal={setShowModal}
         citasByDate={citasByDate}
@@ -469,10 +480,17 @@ export default function HorarioMedico() {
         handleDelete={handleDelete}
         setSelectedCell={setSelectedCell}
         setSelectedDay={setSelectedDay}
+        showAssistanceModal={showAssistanceModal}
+        setShowAssistanceModal={setShowAssistanceModal}
+        citas={citas}
+        updateCita={updateCita}
+        deleteCita={deleteCita}
+        refetchCitas={refetchCitas}
       />
       <ModalCrearCita
         showForm={showForm}
         selectedCell={selectedCell}
+        setSelectedDate={setSelectedDate}
         selectedDate={selectedDate}
         selectedClient={selectedClient}
         searchTerm={searchTerm}

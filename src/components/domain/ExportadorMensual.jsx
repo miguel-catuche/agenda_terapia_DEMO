@@ -69,9 +69,8 @@ const ExportadorMensual = ({ citas, clientes }) => {
 
         const agendadas = citasMes.length;
         const programadas = citasMes.filter(c => c.estado === "programada").length;
-        const completadas = citasMes.filter(c => c.estado === "completada").length;
-        const canceladas = citasMes.filter(c => c.estado === "cancelada").length;
-        const noAsistieron = citasMes.filter(c => c.estado === "no-se-presento").length;
+        const asistieron = citasMes.filter(c => c.estado === "asistio").length;
+        const noAsistieron = citasMes.filter(c => c.estado === "no-asistio").length;
 
         const nuevos = clientesMes.length;
         const terapia = clientesMes.filter(c => c.motivo === "Terapia").length;
@@ -84,8 +83,7 @@ Resumen Mensual ${mesDiccionary(mes)} / ${año}
 Total agendadas,${agendadas},100%
 Estado,Valor,Porcentaje
 Programadas,${programadas},${porcentaje(programadas, agendadas)}
-Completadas,${completadas},${porcentaje(completadas, agendadas)}
-Canceladas,${canceladas},${porcentaje(canceladas, agendadas)}
+Asistieron,${asistieron},${porcentaje(asistieron, agendadas)}
 No asistieron,${noAsistieron},${porcentaje(noAsistieron, agendadas)}
 
 Clientes Nuevos ${mesDiccionary(mes)} / ${año}
