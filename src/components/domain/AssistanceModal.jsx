@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Download } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, X } from "lucide-react";
+import { supabase } from "@/supabaseClient";
 import { useServicioLabels } from "@/helpers/useServicioLabels";
 import {
   Select,
@@ -11,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import toast from "react-hot-toast";
 import { generarPDFCitas } from "../pdf/generarPDFCitas";
-
 
 // --- Modal secundario: lista de citas por hora ---
 const HourCitasModal = ({ show, onClose, citasHora, onEstadoChange, onGuardar }) => {
@@ -31,61 +31,76 @@ const HourCitasModal = ({ show, onClose, citasHora, onEstadoChange, onGuardar })
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl shadow-lg p-6 w-[700px] max-h-[80vh] overflow-y-auto"
+        className="
+          bg-white rounded-xl shadow-lg 
+          p-4 sm:p-6 
+          w-[95%] sm:w-[500px] md:w-[650px] lg:w-[700px] 
+          max-h-[80vh] overflow-y-auto
+        "
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-lg font-semibold mb-4">Citas de la hora seleccionada</h3>
+        <h3 className="text-lg font-semibold mb-4">Citas agendadas</h3>
 
-        <table className="w-full text-sm border-collapse">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-2 text-left">Cliente</th>
-              <th className="p-2 text-left">Documento</th>
-              <th className="p-2 text-left">Servicio</th>
-              <th className="p-2 text-left">Hora</th>
-              <th className="p-2 text-center">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {citasHora.map((cita) => (
-              <tr key={cita.id} className="border-t hover:bg-gray-50">
-                <td className="p-2">{cita.clientes_servicio?.cliente?.nombre || "—"}</td>
-                <td className="p-2">{cita.clientes_servicio?.cliente_id || "—"}</td>
-                <td className="p-2">{getLabel(cita.clientes_servicio?.servicio) || "—"}</td>
-                <td className="p-2">{formatHora(cita.hora) || "—"}</td>
-                <td className="p-2 text-center">
-                  <Select
-                    value={cita.estado}
-                    onValueChange={(v) => onEstadoChange(cita.id, v)}
-                  >
-                    <SelectTrigger className="w-[130px] mx-auto">
-                      <SelectValue placeholder="Estado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="programada">Programada</SelectItem>
-                      <SelectItem value="asistio">Asistió</SelectItem>
-                      <SelectItem value="no-asistio">No asistió</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm border-collapse min-w-[500px]">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="p-2 text-left">Cliente</th>
+                <th className="p-2 text-left">Documento</th>
+                <th className="p-2 text-left">Servicio</th>
+                <th className="p-2 text-left">Hora</th>
+                <th className="p-2 text-center">Estado</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {citasHora.map((cita) => (
+                <tr key={cita.id} className="border-t hover:bg-gray-50">
+                  <td className="p-2">{cita.clientes_servicio?.clientes?.nombre || "—"}</td>
+                  <td className="p-2">{cita.clientes_servicio?.cliente_id || "—"}</td>
+                  <td className="p-2">{getLabel(cita.clientes_servicio?.servicio) || "—"}</td>
+                  <td className="p-2">{formatHora(cita.hora) || "—"}</td>
+                  <td className="p-2 text-center">
+                    <Select
+                      value={cita.estado}
+                      onValueChange={(v) => onEstadoChange(cita.id, v)}
+                    >
+                      <SelectTrigger className="w-[130px] mx-auto">
+                        <SelectValue placeholder="Estado" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="programada">Programada</SelectItem>
+                        <SelectItem value="asistio">Asistió</SelectItem>
+                        <SelectItem value="no-asistio">No asistió</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-        <div className="flex justify-end gap-3 mt-5">
-          <Button className={"cursor-pointer bg-gray-200 hover:bg-bg-gray-200"} variant="secondary" onClick={onClose}>
+        <div className="flex flex-col sm:flex-row justify-end gap-3 mt-5">
+          <Button
+            className="cursor-pointer bg-gray-200 hover:bg-gray-300 w-full sm:w-auto"
+            variant="secondary"
+            onClick={onClose}
+          >
             Cancelar
           </Button>
-          <Button className={"cursor-pointer bg-green-600 hover:bg-bg-green-600"} onClick={onGuardar}>Guardar</Button>
+          <Button
+            className="cursor-pointer bg-green-600 hover:bg-green-700 w-full sm:w-auto"
+            onClick={onGuardar}
+          >
+            Guardar
+          </Button>
         </div>
       </div>
     </div>
   );
 };
 
-
-// --- Modal principal de asistencia ---
+// --- Modal principal ---
 const AssistanceModal = ({
   showAssistanceModal,
   setShowAssistanceModal,
@@ -110,8 +125,38 @@ const AssistanceModal = ({
   };
 
   useEffect(() => {
-    setLocalCitas(citas);
-  }, [citas]);
+    const fetchCitasDia = async () => {
+      try {
+        const fecha = selectedDate.toISOString().split("T")[0];
+
+        const { data, error } = await supabase
+          .from("citas")
+          .select(`
+    *,
+    clientes_servicio (
+      *,
+      clientes (*)
+    )
+  `)
+          .eq("fecha", fecha)
+          .order("hora", { ascending: true });
+
+
+        if (error) {
+          console.error("Error cargando citas del día:", error);
+          return;
+        }
+
+        setLocalCitas(data);
+      } catch (err) {
+        console.error("Excepción cargando citas:", err);
+      }
+    };
+
+    if (selectedDate) {
+      fetchCitasDia();
+    }
+  }, [selectedDate]);
 
   const handleEstadoChange = (id, estado) => {
     setLocalCitas((prev) =>
@@ -121,7 +166,7 @@ const AssistanceModal = ({
 
   const handleGuardar = useCallback(async () => {
     const modificadas = localCitas.filter((c) => c._modificado);
-    if (modificadas.length === 0) return toast.info("No hay cambios por guardar");
+    if (modificadas.length === 0) return toast("No hay cambios para guardar");
 
     for (const cita of modificadas) {
       try {
@@ -158,19 +203,20 @@ const AssistanceModal = ({
   })}`;
 
   const selectedDateStr = selectedDate.toISOString().split("T")[0];
+
   const citasFiltradas = useMemo(
     () =>
       localCitas.filter((cita) => {
-        const citaDate = new Date(cita.fecha).toISOString().split("T")[0];
+        const citaDate = cita.fecha.split("T")[0]; // <-- NO UTC conversion
         return citaDate === selectedDateStr;
       }),
-    [localCitas, selectedDateStr]
+    [localCitas, selectedDateStr]    
   );
+
 
   const citasPorHora = (hora) =>
     citasFiltradas.filter((c) => c.hora?.startsWith(hora));
 
-  // 🔹 Descargar PDF solo del día actual
   const handleDescargarPDF = () => {
     if (citasFiltradas.length === 0) {
       toast.error("No hay citas para este día");
@@ -190,53 +236,85 @@ const AssistanceModal = ({
       onClick={() => setShowAssistanceModal(false)}
     >
       <div
-        className="bg-white rounded-xl shadow-lg p-6 w-[900px]"
+        className="
+          bg-white rounded-xl shadow-lg 
+          p-4 sm:p-6 
+          w-[95%] 
+          sm:w-[600px] md:w-[750px] lg:w-[900px] 
+          max-h-[90vh] 
+          overflow-y-auto
+        "
         onClick={(e) => e.stopPropagation()}
       >
         {/* ===== HEADER ===== */}
-        <div className="flex justify-between items-center mb-6">
-          {/* Grupo de navegación (fijo) */}
-          <div className="flex items-center gap-2">
-            <Button className={"cursor-pointer"} variant="ghost" size="icon" onClick={() => handleDayChange(-1)}>
+        <div className="flex flex-col w-full mb-6">
+
+          {/* ROW PRINCIPAL DEL HEADER */}
+          <div className="flex items-center justify-between w-full">
+
+            {/* Flecha izquierda */}
+            <Button variant="ghost" size="icon" onClick={() => handleDayChange(-1)}>
               <ChevronLeft className="w-5 h-5" />
             </Button>
 
-            {/* Título con ancho fijo para evitar que se mueva */}
-            <h2
-              className="font-semibold text-lg text-gray-800 capitalize text-center"
-              style={{ width: "260px" }} // 👈 ancho fijo
-            >
+            {/* Texto de la fecha */}
+            <h2 className="font-semibold text-lg text-gray-800 capitalize text-center flex-1 mx-3">
               {formattedHeader}
             </h2>
 
-            <Button className={"cursor-pointer"} variant="ghost" size="icon" onClick={() => handleDayChange(1)}>
+            {/* Flecha derecha */}
+            <Button variant="ghost" size="icon" onClick={() => handleDayChange(1)}>
               <ChevronRight className="w-5 h-5" />
             </Button>
-          </div>
 
-          {/* Botón Descargar (fijo) */}
-          <Button className={"cursor-pointer bg-gray-100 hover:bg-bg-gray-200"} variant="outline" size="sm" onClick={handleDescargarPDF}>
-            <Download className="w-4 h-4 mr-1" /> Descargar
-          </Button>
+            {/* Zona derecha fija: Descargar + Cerrar */}
+            <div className="flex items-center gap-3 ml-4">
+
+              {/* Botón Descargar */}
+              <Button
+                className="cursor-pointer bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
+                variant="outline"
+                size="sm"
+                onClick={handleDescargarPDF}
+              >
+                <Download className="w-4 h-4" />
+                <span className="hidden sm:inline ml-1">Descargar</span>
+              </Button>
+
+              {/* Botón Cerrar (rojo) */}
+              <Button
+                className="cursor-pointer bg-red-600 hover:bg-red-700 text-white flex items-center justify-center"
+                size="icon"
+                onClick={() => setShowAssistanceModal(false)}
+              >
+                <X />
+              </Button>
+
+            </div>
+
+          </div>
         </div>
 
 
         {/* ===== HORAS ===== */}
-        <div className="grid grid-cols-8 gap-3 text-center">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 text-center">
+
           {hours.map((hora) => {
             const citasHora = citasPorHora(hora);
             const count = citasHora.length;
+
             return (
               <div key={hora} className="flex flex-col items-center">
-                <div className="font-medium text-gray-700">{hora}</div>
+                <div className="font-medium text-gray-700 whitespace-nowrap">{hora}</div>
+
                 <div
-                  className={`mt-2 px-3 py-2 w-full border rounded-lg cursor-pointer transition text-sm ${count === 0
+                  className={`mt-2 px-3 py-2 w-full border rounded-lg cursor-pointer transition text-sm text-center
+            ${count === 0
                       ? "bg-gray-100 text-gray-500"
                       : "bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium"
-                    }`}
-                  onClick={() =>
-                    count > 0 && (setSelectedHour(hora), setShowHourModal(true))
+                    }`
                   }
+                  onClick={() => count > 0 && (setSelectedHour(hora), setShowHourModal(true))}
                 >
                   {count === 0 ? "Sin citas" : `${count} cita${count > 1 ? "s" : ""}`}
                 </div>
@@ -245,11 +323,6 @@ const AssistanceModal = ({
           })}
         </div>
 
-        <div className="flex justify-end mt-6">
-          <Button className={"cursor-pointer bg-red-600 hover:bg-bg-red-600 text-white"} variant="secondary" onClick={() => setShowAssistanceModal(false)}>
-            Cerrar
-          </Button>
-        </div>
 
         <HourCitasModal
           show={showHourModal}

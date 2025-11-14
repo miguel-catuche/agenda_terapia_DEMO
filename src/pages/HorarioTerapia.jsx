@@ -331,7 +331,7 @@ export default function HorarioMedico() {
               ← Semana anterior
             </Button>
           </div>
-          <div className="md:flex md:justify-center md:gap-2">
+          <div className="md:flex md:justify-center md:gap-2 md:space-y-0 space-y-4">
             <Button
               className="w-full md:w-40 cursor-pointer bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all"
               onClick={() => setMode(mode === "view" ? "edit" : "view")}
