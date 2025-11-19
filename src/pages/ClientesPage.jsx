@@ -398,7 +398,6 @@ const ClientesPage = () => {
                 handleSelectClient={handleSelectClient}
                 setFormData={setFormDataCita}
                 setShowForm={setShowCitaModal}
-                handleSubmit={handleSubmit}
             />
 
         </div >

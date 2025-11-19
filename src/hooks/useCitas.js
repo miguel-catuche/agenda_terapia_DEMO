@@ -5,6 +5,10 @@ export const useCitas = (startDate, endDate) => {
   const [citas, setCitas] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Valores por defecto (Colombia)
+  const DEFAULT_START = startDate || "2000-01-01";
+  const DEFAULT_END = endDate || "2100-01-01";
+
   const fetchCitas = async () => {
     setLoading(true);
 
@@ -27,8 +31,8 @@ export const useCitas = (startDate, endDate) => {
         )
       `
       )
-      .gte("fecha", startDate)
-      .lte("fecha", endDate)
+      .gte("fecha", DEFAULT_START)
+      .lte("fecha", DEFAULT_END)
       .order("fecha", { ascending: true });
 
     if (error) {
@@ -41,8 +45,8 @@ export const useCitas = (startDate, endDate) => {
     setLoading(false);
   };
 
+  // Solo recargar cuando cambien explícitamente las fechas
   useEffect(() => {
-    if (!startDate || !endDate) return;
     fetchCitas();
   }, [startDate, endDate]);
 
