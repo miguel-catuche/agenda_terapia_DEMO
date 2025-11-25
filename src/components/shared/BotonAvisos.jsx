@@ -5,7 +5,7 @@ const BotonAvisos = ({ onClick, cantidad = 0 }) => {
     <button
       type="button"
       onClick={onClick}
-      className="fixed bottom-6 right-6 bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-3 rounded-full shadow-lg z-[9999] flex items-center gap-2 transition"
+      className="fixed bottom-6 right-6 bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-3 rounded-full shadow-lg z-10 flex items-center gap-2 transition"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

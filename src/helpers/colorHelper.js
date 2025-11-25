@@ -51,8 +51,8 @@ export const getEstadoClasses = (estado) => {
     case "asistio":
       return 'bg-green-200 border border-green-300 text-green-900 font-semibold';
     case "programada":
-      return 'bg-blue-200 border border-blue-300 text-blue-800 font-semibold';
+      return 'bg-gray-100 border border-gray-300 text-blue-800 font-semibold';
     default:
-      return "bg-gray-200";
+      return "bg-pink-200";
   }
 };
