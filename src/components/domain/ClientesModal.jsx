@@ -53,7 +53,7 @@ export default function ClientesModal({
                     onClick={() => {
                         setShowAddModal(false);
                     }}>
-                    <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96"
+                    <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96" id="addClientForm"
                         onClick={(e) => e.stopPropagation()}>
                         <h3 className="font-bold mb-4 text-gray-800 text-center">Añadir Nuevo Cliente</h3>
                         <form onSubmit={handleAddSubmit} className="space-y-3">
@@ -110,7 +110,7 @@ export default function ClientesModal({
                             </div>
 
                             <div className="flex justify-end space-x-2 mt-4">
-                                <Button className={"cursor-pointer"} type="button" variant="outline" onClick={() => setShowAddModal(false)}>
+                                <Button id="closeBtnRegister" className={"cursor-pointer"} type="button" variant="outline" onClick={() => setShowAddModal(false)}>
                                     Cancelar
                                 </Button>
                                 <Button className={"cursor-pointer bg-green-600 hover:bg-green-700"} type="submit">Guardar</Button>
@@ -125,7 +125,7 @@ export default function ClientesModal({
                     onClick={() => {
                         setShowEditModal(false)
                     }} >
-                    <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96"
+                    <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96" id="editClientForm"
                         onClick={(e) => e.stopPropagation()}>
                         <h3 className="font-bold mb-4 text-gray-800 text-center">Editar Cliente</h3>
                         <form onSubmit={handleEditSubmit} className="space-y-3">
@@ -211,7 +211,7 @@ export default function ClientesModal({
             {
                 showDeleteModal && selectedClient && (
                     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-                        <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96 text-center">
+                        <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96 text-center" id="deleteClientForm">
                             <h3 className="font-bold mb-4 text-gray-800">Confirmar Eliminación</h3>
                             <p className="text-gray-700 mb-4">
                                 ¿Estás seguro de que deseas eliminar al paciente <strong>{selectedClient.nombre}</strong>?
@@ -239,7 +239,7 @@ export default function ClientesModal({
                         onClick={() => {
                             setShowHistoryModal(false)
                         }} >
-                        <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-[600px]"
+                        <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-[600px]" id="allHistoryClient"
                             onClick={(e) => e.stopPropagation()}>
                             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
                                 <div>
@@ -258,6 +258,7 @@ export default function ClientesModal({
                                 <div className="flex gap-2">
                                     {modoHistorial === "detalle" && (
                                         <Button
+                                            id="printHistoryClient"
                                             variant="ghost"
                                             onClick={() => {
                                                 const citasFiltradas = citasPorServicio[servicioDetalle] || [];
@@ -292,7 +293,7 @@ export default function ClientesModal({
                                         return (
                                             <Card key={index} className="p-4 bg-gray-50">
                                                 <CardContent className="p-0">
-                                                    <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
+                                                    <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2" id="availableServicesClient">
                                                         <div className="text-sm text-gray-700">
                                                             <p><strong>Servicio:</strong> {servicioLabels[servicio] || servicio}</p>
                                                             <p><strong>Sesiones:</strong> {sesiones}</p>
@@ -300,6 +301,7 @@ export default function ClientesModal({
                                                         </div>
                                                         <div className="flex gap-2">
                                                             <Button
+                                                                id="watchHistory"
                                                                 variant="ghost"
                                                                 onClick={() => {
                                                                     setServicioDetalle(servicio);
@@ -311,6 +313,7 @@ export default function ClientesModal({
                                                                 Ver
                                                             </Button>
                                                             <Button
+                                                                id="printHistory"
                                                                 variant="ghost"
                                                                 onClick={() => generarPDFHistorial(selectedClient, citas)}
                                                                 className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700 hover:text-white transition-colors"
@@ -357,7 +360,7 @@ export default function ClientesModal({
                         onClick={() => {
                             setShowAddServicioModal(false)
                         }}>
-                        <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96"
+                        <div className="bg-white rounded-xl shadow-lg p-6 w-84 md:w-96" id="mangeServicesClient"
                             onClick={(e) => e.stopPropagation()}>
                             <h3 className="font-bold mb-4 text-gray-800 text-center">
                                 Gestión de Servicios

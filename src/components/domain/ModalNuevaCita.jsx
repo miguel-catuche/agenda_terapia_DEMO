@@ -167,7 +167,7 @@ export default function ModalNuevaCita({
 
       {/* CONTENEDOR 1 — BUSCADOR */}
       {!selectedClient && (
-        <div className="p-4 border rounded-lg bg-gray-50 mb-6">
+        <div className="p-4 border rounded-lg bg-gray-50 mb-6" id="searchToDate">
           <label className="block text-sm text-gray-700">
             Buscar paciente
           </label>
@@ -208,7 +208,7 @@ export default function ModalNuevaCita({
 
       {/* CONTENEDOR 2 — FORMULARIO PRINCIPAL */}
       {selectedClient && (
-        <form onSubmit={enviar} className="relative p-4 border rounded-lg bg-gray-50">
+        <form onSubmit={enviar} className="relative p-4 border rounded-lg bg-gray-50" id="formDateTour">
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 

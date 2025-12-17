@@ -163,7 +163,11 @@ export default function Icon({ name, size = 24, className = "" }) {
         <path d="M20 6 9 17l-5-5" />
       </svg>
     ),
-
+    play: (
+      <svg {...commonProps} strokeWidth="4" className={`lucide lucide-check-icon ${className}`}>
+        <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
+      </svg>
+    ),
   };
 
   return icons[name] || null;

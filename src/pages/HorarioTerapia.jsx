@@ -12,6 +12,7 @@ import { useServicioLabels } from "@/helpers/useServicioLabels";
 import { useClientesServicioGlobal } from "@/hooks/useClientesServicioGlobal";
 import GeneradorSeguimiento from "@/components/domain/GeneradorSeguimiento";
 import ModalCrearCita from "@/components/domain/ModalCrearCita";
+import TourButton from "@/tour/tourButton";
 
 const hours = [
   "07:00:00",
@@ -333,6 +334,7 @@ export default function HorarioMedico() {
           </div>
           <div className="md:flex md:justify-center md:gap-2 md:space-y-0 space-y-4">
             <Button
+              id="addDate"
               className="w-full md:w-40 cursor-pointer bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all"
               onClick={() => setMode(mode === "view" ? "edit" : "view")}
             >
@@ -349,6 +351,7 @@ export default function HorarioMedico() {
               )}
             </Button>
             <Button
+              id="takeAssitance"
               className="w-full md:w-40 cursor-pointer bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all"
               onClick={() => {
                 setShowAssistanceModal(true)
@@ -358,6 +361,7 @@ export default function HorarioMedico() {
               Tomar Asistencia
             </Button>
           </div>
+
           <div className="md:flex md:justify-end">
             <Button
               className="w-full md:w-auto cursor-pointer text-blue-600 bg-blue-50 hover:bg-blue-200 font-medium"
@@ -367,8 +371,11 @@ export default function HorarioMedico() {
             </Button>
           </div>
         </div>
+        <div className="flex justify-center pt-5">
+          <TourButton></TourButton>
+        </div>
       </div>
-      <div className="rounded-xl shadow-lg border border-gray-300 bg-white md:overflow-hidden overflow-visible">
+      <div className="rounded-xl shadow-lg border border-gray-300 bg-white md:overflow-hidden overflow-visible" id="scheduleContainer">
         <div ref={headerScrollRef} className="overflow-x-auto no-scrollbar">
           <div className="grid grid-cols-[100px_repeat(5,minmax(0,1fr))] min-w-[700px] md:grid-cols-[160px_repeat(5,minmax(0,1fr))] bg-gray-100 border-b border-gray-300">
             <div className="sticky left-0 z-10 bg-gray-100 w-[100px] md:w-[160px] flex items-center justify-center 
@@ -385,6 +392,7 @@ export default function HorarioMedico() {
               return (
                 <div
                   key={day}
+                  id="daysTour"
                   className="font-bold text-black bg-blue-100 hover:bg-blue-200 py-1 text-center cursor-pointer flex flex-col items-center"
                   onClick={() => {
                     setSelectedDay(day);
@@ -409,7 +417,8 @@ export default function HorarioMedico() {
             {hours.map((hour) => (
               <React.Fragment key={hour}>
                 {/* Columna de hora sticky */}
-                <div className="border-b font-bold text-white flex items-center justify-center bg-gradient-to-r from-blue-500 to-teal-500 border-r border-gray-200 sticky left-0 z-10">
+                <div id="hoursTour" 
+                className="border-b font-bold text-white flex items-center justify-center bg-gradient-to-r from-blue-500 to-teal-500 border-r border-gray-200 sticky left-0 z-10">
                   {hour.slice(0, 5)}
                 </div>
 
@@ -422,6 +431,7 @@ export default function HorarioMedico() {
                   return (
                     <Card
                       key={day + hour}
+                      id="cardDatesTour"
                       className={`cursor-pointer h-20 flex items-center justify-center text-sm transition-colors rounded-lg ${mode === "edit"
                         ? "bg-yellow-300 hover:bg-yellow-500"
                         : tieneCitas
@@ -459,7 +469,7 @@ export default function HorarioMedico() {
           </div>
         </div>
       </div>
-      <div className="mt-6">
+      <div className="mt-6" id="followUpDownload">
         <GeneradorSeguimiento citas={citas} />
       </div>
 

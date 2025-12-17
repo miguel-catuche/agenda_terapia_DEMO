@@ -228,13 +228,14 @@ const ClientesPage = () => {
     return (
         <div className="p-2 mx-auto">
             <Card className="mb-6 py-2">
-                <CardContent className="p-4 space-y-4">
+                <CardContent className="p-4 space-y-4" id="adminClientTour">
                     <div>
                         <h3 className="text-xl font-semibold text-gray-700">Administración de Clientes</h3>
                         <p className="text-gray-500">Gestiona la información de todos tus pacientes</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div
+                            id='registerBtnTour'
                             className="cursor-pointer bg-blue-100 hover:bg-blue-200 rounded-xl p-6 shadow-md hover:shadow-lg transition-all flex flex-col items-center text-center space-y-2"
                             onClick={openAddModal}
                         >
@@ -245,6 +246,7 @@ const ClientesPage = () => {
                             <p className="text-sm text-gray-600">Agregar un nuevo paciente al sistema</p>
                         </div>
                         <div
+                            id='addBtnTour'
                             className="cursor-pointer bg-green-100 hover:bg-green-200 rounded-xl p-6 shadow-md hover:shadow-lg transition-all flex flex-col items-center text-center space-y-2"
                             onClick={openCitaModal}
                         >
@@ -259,7 +261,7 @@ const ClientesPage = () => {
             </Card>
 
 
-            <div className="bg-white rounded-xl shadow-md mb-8">
+            <div className="bg-white rounded-xl shadow-md mb-8" id='clientListTour'>
                 <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
@@ -269,6 +271,7 @@ const ClientesPage = () => {
                         <div className="flex items-center w-full md:w-64 bg-white border border-gray-300 rounded-lg shadow-sm px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500">
                             <Icon name="search" className="text-gray-400 mr-2" />
                             <input
+                                id='searchClientTour'
                                 type="text"
                                 placeholder="Buscar cliente..."
                                 value={query}
@@ -292,7 +295,7 @@ const ClientesPage = () => {
                     <TableBody>
                         {(debouncedQuery ? filteredClients : clientesAleatorios).map(cliente => (
                             <TableRow key={cliente.id}>
-                                <TableCell className="font-semibold text-sm px-4 py-3">
+                                <TableCell className="font-semibold text-sm px-4 py-3" id="eachClientTour">
                                     <div className='flex items-center gap-3'>
                                         <div className="bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center">
                                             <Icon className='text-blue-400' name={"person"} />
@@ -300,19 +303,20 @@ const ClientesPage = () => {
                                         {cliente.nombre}
                                     </div>
                                 </TableCell>
-                                <TableCell className="text-sm px-4 py-3 w-50">{cliente.id}</TableCell>
-                                <TableCell className="text-sm px-4 py-3 w-50">{cliente.telefono}</TableCell>
-                                <TableCell className="text-sm px-4 py-3 w-50">
+                                <TableCell id="clientIdTour" className="text-sm px-4 py-3 w-50">{cliente.id}</TableCell>
+                                <TableCell id="clientPhoneTour" className="text-sm px-4 py-3 w-50">{cliente.telefono}</TableCell>
+                                <TableCell id="clientReasonTour" className="text-sm px-4 py-3 w-50">
                                     <span className={`inline-block min-w-[15px] px-2 text-sm font-medium text-center rounded ${getMotivoColor(cliente.motivo)}`}>
                                         {motivoLabels[cliente.motivo] || cliente.motivo}
                                     </span>
                                 </TableCell>
                                 <TableCell className="px-4 py-3 text-right w-50">
-                                    <div className="flex gap-2">
-                                        <Button title="Gestión de Servicios" className={"cursor-pointer bg-amber-200 hover:bg-amber-400 text-amber-700 hover:text-white transition-colors"} variant="outline" size="sm" onClick={() => openAddService(cliente)}>
+                                    <div className="flex gap-2" id='clientActionsTour' >
+                                        <Button id="clientServiceTour" title="Gestión de Servicios" className={"cursor-pointer bg-amber-200 hover:bg-amber-400 text-amber-700 hover:text-white transition-colors"} variant="outline" size="sm" onClick={() => openAddService(cliente)}>
                                             <Icon name={"personservices"} />
                                         </Button>
                                         <Button
+                                            id="clientHistoryTour"
                                             title="Ver historial"
                                             className={"cursor-pointer bg-blue-100 hover:bg-blue-500 text-blue-500 hover:text-white transition-colors"} variant="outline" size="sm"
                                             onClick={() => {
@@ -324,10 +328,10 @@ const ClientesPage = () => {
                                             <Icon name={"calendar"} />
                                         </Button>
 
-                                        <Button title="Editar Cliente" className={"cursor-pointer bg-green-100 hover:bg-green-500 text-green-600 hover:text-white transition-colors"} variant="outline" size="sm" onClick={() => openEditModal(cliente)}>
+                                        <Button id="clientEditTour" title="Editar Cliente" className={"cursor-pointer bg-green-100 hover:bg-green-500 text-green-600 hover:text-white transition-colors"} variant="outline" size="sm" onClick={() => openEditModal(cliente)}>
                                             <Icon name={"edit"} />
                                         </Button>
-                                        <Button title="Eliminar Cliente" className={"cursor-pointer bg-red-100 hover:bg-red-500 text-red-500 hover:text-white transition-colors"} variant="outline" size="sm" onClick={() => openDeleteModal(cliente)}>
+                                        <Button id="clientDeleteTour" title="Eliminar Cliente" className={"cursor-pointer bg-red-100 hover:bg-red-500 text-red-500 hover:text-white transition-colors"} variant="outline" size="sm" onClick={() => openDeleteModal(cliente)}>
                                             <Icon name={"delete"} />
                                         </Button>
                                     </div>

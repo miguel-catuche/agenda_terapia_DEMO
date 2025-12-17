@@ -62,7 +62,7 @@ const Header = ({ onLogout }) => {
         <TituloDinamico />
         <nav className="flex items-center gap-4">
           <button
-            className="md:hidden absolute top-4 right-6 z-50 text-gray-700 cursor-pointer"
+            className="md:hidden absolute top-4 right-6 z-50 text-gray-700 cursor-pointer" id="toggleTour"
             onClick={() => setMenuOpen(true)}
           >
             <Icon name="menu" size={32} />
@@ -72,7 +72,7 @@ const Header = ({ onLogout }) => {
             <div className="flex items-center bg-gray-100 rounded-xl p-2">
               <NavLink to="/horario">
                 {({ isActive }) => (
-                  <Button className={`cursor-pointer px-6 py-2.5 ${isActive ? activeColorClasses : inactiveColorClasses}`}>
+                  <Button id="horarioTour" className={`cursor-pointer px-6 py-2.5 ${isActive ? activeColorClasses : inactiveColorClasses}`}>
                     <Icon name="calendar" />Horario
                   </Button>
                 )}
@@ -80,7 +80,7 @@ const Header = ({ onLogout }) => {
 
               <NavLink to="/metricas">
                 {({ isActive }) => (
-                  <Button className={`cursor-pointer px-6 py-2.5 ${isActive ? activeColorClasses : inactiveColorClasses}`}>
+                  <Button id="metricasTour" className={`cursor-pointer px-6 py-2.5 ${isActive ? activeColorClasses : inactiveColorClasses}`}>
                     <Icon name="stats" />Estadísticas
                   </Button>
                 )}
@@ -88,7 +88,7 @@ const Header = ({ onLogout }) => {
 
               <NavLink to="/clientes">
                 {({ isActive }) => (
-                  <Button className={`cursor-pointer px-6 py-2.5 ${isActive ? activeColorClasses : inactiveColorClasses}`}>
+                  <Button id="clientesTour" className={`cursor-pointer px-6 py-2.5 ${isActive ? activeColorClasses : inactiveColorClasses}`}>
                     <Icon name="people" />Clientes
                   </Button>
                 )}
@@ -119,21 +119,21 @@ const Header = ({ onLogout }) => {
 
           <NavLink to="/horario" onClick={() => setMenuOpen(false)}>
             {({ isActive }) => (
-              <Button className={`mt-5 cursor-pointer w-50 px-6 py-2.5 ${isActive ? activeColorClasses : inactiveColorClasses}`}>
+              <Button id="horarioTourM" className={`mt-5 cursor-pointer w-50 px-6 py-2.5 ${isActive ? activeColorClasses : inactiveColorClasses}`}>
                 <Icon name="calendar" />Horario
               </Button>
             )}
           </NavLink>
           <NavLink to="/metricas" onClick={() => setMenuOpen(false)}>
             {({ isActive }) => (
-              <Button className={`cursor-pointer w-50 px-6 py-2.5 ${isActive ? activeColorClasses : inactiveColorClasses}`}>
+              <Button id="metricasTourM" className={`cursor-pointer w-50 px-6 py-2.5 ${isActive ? activeColorClasses : inactiveColorClasses}`}>
                 <Icon name="stats" />Estadísticas
               </Button>
             )}
           </NavLink>
           <NavLink to="/clientes" onClick={() => setMenuOpen(false)}>
             {({ isActive }) => (
-              <Button className={`cursor-pointer w-50 px-6 py-2.5 ${isActive ? activeColorClasses : inactiveColorClasses}`}>
+              <Button id="clientesTourM" className={`cursor-pointer w-50 px-6 py-2.5 ${isActive ? activeColorClasses : inactiveColorClasses}`}>
                 <Icon name="people" />Clientes
               </Button>
             )}

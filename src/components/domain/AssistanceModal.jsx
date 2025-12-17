@@ -210,12 +210,19 @@ const AssistanceModal = ({
         const citaDate = cita.fecha.split("T")[0]; // <-- NO UTC conversion
         return citaDate === selectedDateStr;
       }),
-    [localCitas, selectedDateStr]    
+    [localCitas, selectedDateStr]
   );
 
 
-  const citasPorHora = (hora) =>
-    citasFiltradas.filter((c) => c.hora?.startsWith(hora));
+  const citasPorHora = (horaBase) => {
+    const baseHour = horaBase.split(":")[0]; // "09"
+    return citasFiltradas.filter((c) => {
+      if (!c.hora) return false;
+      const citaHour = c.hora.split(":")[0];
+      return citaHour === baseHour;
+    });
+  };
+
 
   const handleDescargarPDF = () => {
     if (citasFiltradas.length === 0) {
@@ -327,7 +334,11 @@ const AssistanceModal = ({
         <HourCitasModal
           show={showHourModal}
           onClose={() => setShowHourModal(false)}
-          citasHora={citasFiltradas.filter((c) => c.hora?.startsWith(selectedHour))}
+          citasHora={citasFiltradas.filter((c) => {
+            if (!c.hora || !selectedHour) return false;
+            return c.hora.split(":")[0] === selectedHour.split(":")[0];
+          })}
+
           onEstadoChange={handleEstadoChange}
           onGuardar={handleGuardar}
         />
