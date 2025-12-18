@@ -18,7 +18,7 @@ const Header = ({ onLogout }) => {
       if (location.pathname === "/clientes") {
         return (
           <div className="flex items-center gap-2">
-            <Icon name="people" className="text-green-500"/>
+            <Icon name="people" className="text-green-500" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-blue-500 text-lg md:text-2xl font-bold">
               Gestión de Clientes
             </span>
@@ -28,7 +28,7 @@ const Header = ({ onLogout }) => {
       if (location.pathname === "/horario") {
         return (
           <div className="flex items-center gap-2">
-            <Icon name="calendarT" className="text-green-500"/>
+            <Icon name="calendarT" className="text-green-500" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-blue-500 text-lg md:text-2xl font-bold">
               Horario Semanal
             </span>
@@ -38,7 +38,7 @@ const Header = ({ onLogout }) => {
       if (location.pathname === "/metricas") {
         return (
           <div className="flex items-center gap-2">
-            <Icon name="statsT" className="text-green-500"/>
+            <Icon name="statsT" className="text-green-500" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-blue-500 text-lg md:text-2xl font-bold">
               Estadísticas
             </span>
@@ -109,8 +109,9 @@ const Header = ({ onLogout }) => {
         </nav>
       </header>
       {menuOpen && (
-        <div className=" top-0 right-0 h-screen w-64 bg-gray-100 pt-12 shadow-lg z-50 p-6 flex flex-col gap-4 fixed">
+        <div id="menurBarToggle" className=" top-0 right-0 h-screen w-64 bg-gray-100 pt-12 shadow-lg z-50 p-6 flex flex-col gap-4 fixed">
           <button
+            id="closeToggle"
             className="cursor-pointer absolute top-4 right-6 text-gray-700"
             onClick={() => setMenuOpen(false)}
           >
