@@ -25,6 +25,6 @@ contraseña: admin123
 - Interfaces dinámicas y responsivas
 - Consumo de APIs REST
 
-## 🧪 Entorno de prueba
+## Entorno de prueba
 La demo utiliza una base de datos independiente en un entorno de pruebas, separada del entorno productivo del cliente.
 
