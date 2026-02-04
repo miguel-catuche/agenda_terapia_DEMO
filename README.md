@@ -6,7 +6,7 @@ Este proyecto corresponde a un trabajo freelance realizado de manera integral, d
 ## Demo
 https://agenda-terapia-demo.vercel.app/
 
-## Credenciales:
+## Credenciales de acceso a la demo:
 correo electrónico: admin@admin.com
 contraseña: admin123
 
